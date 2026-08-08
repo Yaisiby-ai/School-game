@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>青春纪事</title>
+<title>Project CZ · 青春纪事</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont/style.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/smiley-sans/style.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/ma-shan-zheng/index.css">
@@ -18,7 +18,6 @@
 html,body{width:100%;height:100%;overflow:hidden;position:fixed;top:0;left:0}
 body{font-family:var(--f-ui);background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);color:#f0e6d3;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
 
-/* ===== 游戏根容器：竖屏时整体旋转90°，实现"伪横屏" ===== */
 #app{position:absolute;top:0;left:0;width:100vw;height:100vh;overflow:hidden}
 @supports(height:100dvh){#app{width:100dvw;height:100dvh}}
 @media (orientation:portrait){
@@ -30,14 +29,12 @@ body{font-family:var(--f-ui);background:linear-gradient(135deg,#1a1a2e,#16213e,#
   @supports(height:100dvh){
     #app{width:100dvh;height:100dvw}
   }
-  /* 竖屏伪横屏下的尺寸微调，防止个别面板溢出 */
   .page{overflow-y:auto;justify-content:safe center}
   .slot-list{max-height:34vh}
   .list{max-height:32vh}
   .grid{width:min(92%,460px)}
 }
 
-/* ===== 横屏提示条：仅提醒，不拦截 ===== */
 .rotate-hint{position:absolute;top:1.6vh;left:50%;transform:translateX(-50%);z-index:9999;
   display:flex;align-items:center;gap:.6em;
   background:rgba(0,0,0,.78);border:1px solid rgba(255,255,255,.28);
@@ -76,7 +73,8 @@ body{font-family:var(--f-ui);background:linear-gradient(135deg,#1a1a2e,#16213e,#
 .home-func button{background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.18);color:rgba(240,230,211,.85);padding:clamp(8px,1.4vh,12px) clamp(12px,1.8vw,18px);border-radius:8px;font-size:clamp(.8em,1.9vh,.95em);cursor:pointer;font-family:inherit;transition:all .25s;text-align:center}
 .home-func button:active{background:rgba(255,255,255,.15)}
 .home-meta{position:absolute;left:2.5vw;bottom:6vh;display:flex;gap:1.4em;font-size:clamp(.7em,1.6vh,.85em);color:rgba(240,230,211,.5)}
-.version-tag{position:absolute;left:2.5vw;bottom:2.2vh;font-size:clamp(.6em,1.4vh,.75em);color:rgba(240,230,211,.28);cursor:pointer}
+.version-tag{position:absolute;left:2.5vw;bottom:2.2vh;font-size:clamp(.6em,1.4vh,.75em);color:rgba(240,230,211,.28);cursor:pointer;transition:transform .12s;user-select:none}
+.project-cz{position:absolute;right:2.5vw;bottom:2.2vh;font-size:clamp(.6em,1.4vh,.75em);color:rgba(240,230,211,.35);letter-spacing:.22em;font-family:var(--f-ui);user-select:none}
 
 .fullscreen-btn{position:fixed;top:1.5vh;right:1.5vw;z-index:50;padding:clamp(8px,1.5vh,12px) clamp(14px,2vw,20px);background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.3);border-radius:8px;color:#fff;cursor:pointer;font-family:inherit;font-size:clamp(.8em,1.8vh,.95em);display:block}
 .fullscreen-btn.hidden{display:none}
@@ -85,15 +83,35 @@ body{font-family:var(--f-ui);background:linear-gradient(135deg,#1a1a2e,#16213e,#
 
 #pg-game{justify-content:flex-end;padding-bottom:2vh}
 .char-area{flex:1;display:flex;align-items:center;justify-content:center;font-size:clamp(3em,8vh,5em);opacity:.3;width:100%}
-.dialogue-box{background:rgba(180,180,190,.16);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);margin:0 auto;padding:clamp(14px,2.2vh,22px) clamp(20px,3vw,32px);padding-bottom:clamp(26px,4vh,38px);border-radius:14px;border:1px solid rgba(255,255,255,.18);min-height:clamp(90px,16vh,130px);cursor:pointer;width:min(92%,760px);position:relative;z-index:5}
-.char-name{font-family:var(--f-story);font-weight:bold;color:#ff8aa0;margin-bottom:.8vh;font-size:clamp(1em,2.2vh,1.25em)}
+
+.dialogue-wrap{position:relative;width:min(92%,760px);margin:0 auto;z-index:5}
+.char-name-plate{position:absolute;bottom:100%;left:clamp(14px,2.5vw,24px);margin-bottom:clamp(4px,.8vh,8px);background:rgba(180,180,190,.16);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);border:1px solid rgba(255,255,255,.18);border-radius:8px;padding:clamp(5px,.9vh,9px) clamp(14px,2vw,20px);font-family:var(--f-story);font-weight:bold;font-size:clamp(1em,2.2vh,1.25em);color:#ff8aa0;z-index:6;white-space:nowrap}
+.dialogue-box{background:rgba(180,180,190,.16);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);padding:clamp(14px,2.2vh,22px) clamp(20px,3vw,32px);padding-bottom:clamp(26px,4vh,38px);border-radius:14px;border:1px solid rgba(255,255,255,.18);min-height:clamp(90px,16vh,130px);cursor:pointer;width:100%;position:relative;z-index:5}
 .dlg-text{font-family:var(--f-story);line-height:1.7;font-size:clamp(1em,2.3vh,1.2em);color:#f3f1ea}
 .special-line{font-family:var(--f-title);letter-spacing:.1em;color:#f4d03f}
 .dlg-hint{position:absolute;right:clamp(10px,1.5vw,16px);bottom:clamp(6px,1vh,10px);font-size:clamp(.62em,1.4vh,.78em);color:rgba(255,255,255,.38);letter-spacing:.12em;font-family:var(--f-ui)}
-.choices{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:none;flex-direction:column;gap:1.5vh;z-index:10;width:min(85%,520px)}
+
+/* 选项：毛玻璃材质，靠对话框右上角 */
+.choices{position:absolute;bottom:calc(100% + 1.2vh);right:0;display:none;flex-direction:column;gap:1vh;width:clamp(230px,32vw,360px);z-index:12}
 .choices.show{display:flex}
-.choice-btn{padding:clamp(16px,2.5vh,24px) clamp(24px,4vw,40px);background:rgba(83,52,131,.92);border:2px solid #e94560;border-radius:10px;color:#fff;cursor:pointer;font-size:clamp(1em,2.2vh,1.2em);font-family:inherit;text-align:center;transition:all .2s;line-height:1.4}
-.choice-btn:active{background:#e94560;transform:scale(.98)}
+.choice-btn{
+  padding:clamp(9px,1.6vh,14px) clamp(14px,2vw,20px);
+  background:rgba(180,180,190,.16);
+  backdrop-filter:blur(3px);
+  -webkit-backdrop-filter:blur(3px);
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:10px;
+  color:#f3f1ea;
+  cursor:pointer;
+  font-size:clamp(.85em,2vh,1.02em);
+  font-family:var(--f-story);
+  text-align:center;
+  line-height:1.5;
+  transition:all .2s;
+  text-shadow:0 1px 4px rgba(0,0,0,.5);
+}
+.choice-btn:active{background:rgba(233,69,96,.4);border-color:#e94560;transform:scale(.98)}
+
 .toolbar{position:absolute;top:1.5vh;right:1.5vw;display:flex;flex-direction:column;align-items:center;gap:1vh;z-index:15}
 .toolbar button{width:clamp(40px,6vh,54px);height:clamp(40px,6vh,54px);border:none;background:transparent;color:rgba(255,255,255,.85);cursor:pointer;font-size:clamp(1.3em,2.8vh,1.7em);display:flex;align-items:center;justify-content:center;transition:all .2s;text-shadow:0 1px 6px rgba(0,0,0,.6)}
 .toolbar button:active{transform:scale(1.18);color:#e94560}
@@ -163,6 +181,41 @@ body{font-family:var(--f-ui);background:linear-gradient(135deg,#1a1a2e,#16213e,#
 
 h2{color:#e94560;margin-bottom:1.5vh;font-size:clamp(1.4em,3.2vh,1.8em)}
 
+/* ===== 邀请码遮罩 ===== */
+.invite-mask{position:absolute;top:0;left:0;width:100%;height:100%;z-index:10000;
+  background:rgba(10,10,20,.82);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity .6s;font-family:var(--f-ui)}
+.invite-mask.fade-out{opacity:0;pointer-events:none}
+.invite-mask.hidden{display:none}
+.invite-panel{display:flex;flex-direction:column;align-items:center;gap:1.6vh;
+  padding:clamp(26px,5vh,44px) clamp(30px,6vw,64px);
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);border-radius:16px;
+  box-shadow:0 8px 40px rgba(0,0,0,.45)}
+.invite-title{font-family:var(--f-brush);font-size:clamp(1.6em,4.5vh,2.4em);color:#f5f0e6;letter-spacing:.2em}
+.invite-sub{font-family:var(--f-story);color:rgba(240,230,211,.55);font-size:clamp(.85em,2vh,1em);letter-spacing:.4em;margin-bottom:.6vh}
+.invite-panel input{width:clamp(220px,30vw,320px);padding:clamp(12px,2vh,16px) clamp(16px,2.5vw,22px);
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.25);border-radius:999px;
+  color:#f0e6d3;font-size:clamp(1em,2.2vh,1.15em);text-align:center;letter-spacing:.25em;
+  font-family:inherit;outline:none;transition:all .3s}
+.invite-panel input:focus{border-color:#e94560;background:rgba(255,255,255,.12)}
+.invite-panel input::placeholder{color:rgba(240,230,211,.3);letter-spacing:.15em}
+.invite-err{font-size:clamp(.8em,1.9vh,.95em);color:#e94560;min-height:1.4em;opacity:0;transition:opacity .3s;font-family:var(--f-story)}
+.invite-err.show{opacity:1;animation:inviteShake .4s}
+.invite-btn{width:clamp(220px,30vw,320px)}
+@keyframes inviteShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+
+/* ===== 彩蛋界面 ===== */
+.cz-egg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:9000;display:none;align-items:center;justify-content:center;cursor:pointer;background:radial-gradient(circle at center,rgba(70,0,12,.94),rgba(0,0,0,.97))}
+.cz-egg.show{display:flex}
+.cz-egg-inner{text-align:center;padding:0 6vw}
+.cz-egg-text{font-family:var(--f-title);font-size:clamp(1.7em,6.5vh,3.6em);color:#ff3b3b;letter-spacing:.05em;line-height:1.35;text-shadow:0 0 26px rgba(255,59,59,.55),0 4px 0 rgba(0,0,0,.5);animation:czSlam .45s cubic-bezier(.18,1.4,.4,1) both,czShake .45s .5s}
+.cz-egg-sub{margin-top:3vh;font-size:clamp(.7em,1.8vh,.9em);color:rgba(255,255,255,.4);letter-spacing:.2em;animation:czFadeIn .6s 1s both}
+@keyframes czSlam{0%{transform:scale(3);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes czShake{0%,100%{transform:translateX(0) rotate(0)}20%{transform:translateX(-9px) rotate(-1.5deg)}40%{transform:translateX(9px) rotate(1.5deg)}60%{transform:translateX(-6px) rotate(-1deg)}80%{transform:translateX(6px) rotate(1deg)}}
+@keyframes czFadeIn{0%{opacity:0}100%{opacity:1}}
+
 .mc-toast{position:fixed;top:8vh;left:-340px;z-index:300;display:flex;align-items:center;gap:14px;background:#212121;border:2px solid #5a5a5a;box-shadow:inset 0 0 0 2px #131313,0 4px 12px rgba(0,0,0,.55);padding:12px 22px 12px 14px;border-radius:2px;animation:mcSlide 4.2s cubic-bezier(.22,.61,.36,1) forwards;min-width:240px}
 .mc-toast .mc-icon{font-size:1.9em;line-height:1}
 .mc-toast .mc-body{display:flex;flex-direction:column;gap:3px}
@@ -184,10 +237,9 @@ h2{color:#e94560;margin-bottom:1.5vh;font-size:clamp(1.4em,3.2vh,1.8em)}
 
 <div id="app">
 
-<!-- 横屏提示条：仅提醒，可关闭，不拦截 -->
 <div class="rotate-hint" id="rotate-hint">
   <span class="rh-icon">📱</span>
-  <span>旋转手机至横屏体验更佳 · 竖屏也可直接游玩</span>
+  <span>横屏游玩体验更佳</span>
   <button class="rh-close" onclick="vibrate(10);dismissHint()">✕</button>
 </div>
 
@@ -222,7 +274,8 @@ h2{color:#e94560;margin-bottom:1.5vh;font-size:clamp(1.4em,3.2vh,1.8em)}
     <span id="s-ach">成就: 0/5</span>
     <span id="s-gal">图鉴: 0/6</span>
   </div>
-  <p class="version-tag" onclick="vibrate(20);runTests()">v2.4</p>
+  <p class="version-tag" id="version-tag" onclick="czEggClick()">Project CZ · v2.6 · 内测</p>
+  <div class="project-cz">PROJECT CZ · 内测版</div>
 </div>
 
 <!-- 游戏页 -->
@@ -244,12 +297,15 @@ h2{color:#e94560;margin-bottom:1.5vh;font-size:clamp(1.4em,3.2vh,1.8em)}
   </div>
   <button class="btn-back" onclick="vibrate(15);saveGame();goBack()">← 返回</button>
   <div class="char-area" id="char-icon">🎭</div>
-  <div class="dialogue-box" onclick="vibrate(10);advance()">
-    <div class="char-name" id="c-name"></div>
-    <div class="dlg-text" id="dlg-text"></div>
-    <div class="dlg-hint">点击对话框继续</div>
+
+  <div class="dialogue-wrap">
+    <div class="char-name-plate" id="c-name"></div>
+    <div class="choices" id="choices"></div>
+    <div class="dialogue-box" onclick="vibrate(10);advance()">
+      <div class="dlg-text" id="dlg-text"></div>
+      <div class="dlg-hint">点击对话框继续</div>
+    </div>
   </div>
-  <div class="choices" id="choices"></div>
 </div>
 
 <!-- 存档/读档面板 -->
@@ -306,12 +362,80 @@ h2{color:#e94560;margin-bottom:1.5vh;font-size:clamp(1.4em,3.2vh,1.8em)}
   <button class="btn-back" style="position:relative;top:auto;left:auto;margin-top:2vh" onclick="vibrate(15);goBack()">← 返回</button>
 </div>
 
+<!-- 邀请码遮罩 -->
+<div class="invite-mask" id="invite-mask">
+  <div class="invite-panel">
+    <div class="invite-title">青春纪事</div>
+    <div class="invite-sub">内测邀请码</div>
+    <input type="text" id="invite-input" placeholder="请输入邀请码" autocomplete="off" maxlength="20">
+    <div class="invite-err" id="invite-err">邀请码错误，请重试</div>
+    <button class="btn-ghost invite-btn" onclick="checkInvite()">确认</button>
+  </div>
+</div>
+
 </div><!-- /app -->
+
+<!-- 彩蛋 -->
+<div class="cz-egg" id="cz-egg" onclick="hideEasterEgg()">
+  <div class="cz-egg-inner">
+    <div class="cz-egg-text">我身边怎么有那么多臭婊子！</div>
+    <div class="cz-egg-sub">— 点击任意处平息怒火 —</div>
+  </div>
+</div>
 
 <script>
 function vibrate(ms){if(navigator.vibrate)navigator.vibrate(ms)}
 
-/* ===== 横屏提示：只提醒不拦截 ===== */
+/* ===== 邀请码验证 ===== */
+function initInvite(){
+  var passed=false;
+  try{passed=localStorage.getItem('invite_pass')==='1'}catch(e){}
+  var mask=document.getElementById('invite-mask');
+  if(passed){mask.className='invite-mask hidden';return}
+  document.getElementById('invite-input').addEventListener('keydown',function(e){
+    if(e.key==='Enter'){e.stopPropagation();checkInvite()}
+  });
+}
+function checkInvite(){
+  var v=document.getElementById('invite-input').value.trim();
+  if(v==='CZ2026'){
+    try{localStorage.setItem('invite_pass','1')}catch(e){}
+    vibrate(30);
+    var mask=document.getElementById('invite-mask');
+    mask.classList.add('fade-out');
+    setTimeout(function(){mask.className='invite-mask hidden'},650);
+    audioUnlocked=true;
+    if(curPage==='home'&&!bgmMuted)bgmPlay();
+  }else{
+    vibrate([40,30,40]);
+    var err=document.getElementById('invite-err');
+    err.classList.remove('show');
+    void err.offsetWidth;
+    err.classList.add('show');
+  }
+}
+
+/* ===== 彩蛋：连点版本号 10 次 ===== */
+var czClicks=0,czResetTimer=null;
+function czEggClick(){
+  vibrate(8);
+  czClicks++;
+  clearTimeout(czResetTimer);
+  czResetTimer=setTimeout(function(){czClicks=0},2500);
+  var vt=document.getElementById('version-tag');
+  if(vt){vt.style.transform='scale(1.18)';setTimeout(function(){vt.style.transform=''},120)}
+  if(czClicks>=10){czClicks=0;showEasterEgg()}
+}
+function showEasterEgg(){
+  vibrate([80,40,80,40,120]);
+  document.getElementById('cz-egg').className='cz-egg show';
+}
+function hideEasterEgg(){
+  vibrate(15);
+  document.getElementById('cz-egg').className='cz-egg';
+}
+
+/* ===== 横屏提示 ===== */
 var mqPortrait=window.matchMedia('(orientation: portrait)');
 var hintDismissed=false,hintTimer=null;
 function updateHint(){
@@ -346,7 +470,6 @@ function lockLandscape(){
 
 var CHAPTER='第一章·入学';
 
-/* ===== 角色 ===== */
 var CHARS={
   '小郑':{n:'小郑',p:'主角',c:'#5b9bd5',i:'🧑'},
   '内心':{n:'内心',p:'小郑的内心',c:'#a0a0b0',i:'💭'},
@@ -357,7 +480,6 @@ var CHARS={
   '老师':{n:'老师',p:'班主任',c:'#e94560',i:'👨‍🏫'}
 };
 
-/* ===== 成就 ===== */
 var ACHS=[
   {id:'a1',n:'初次相遇',d:'开始游戏，踏入学门',i:'🌸'},
   {id:'a2',n:'三好学生',d:'选择乖乖上交手机',i:'📱'},
@@ -366,7 +488,6 @@ var ACHS=[
   {id:'a5',n:'第一章完成',d:'通关第一章全部内容',i:'🎓'}
 ];
 
-/* ===== 图鉴：图片一~六 ===== */
 var GALS=[
   {id:'图片一',t:'image',n:'收费站',i:'🛣️'},
   {id:'图片二',t:'image',n:'教室发呆',i:'😶'},
@@ -376,34 +497,24 @@ var GALS=[
   {id:'图片六',t:'image',n:'教室',i:'🏫'}
 ];
 
-/* ===== 剧情 ===== */
 var SCENES=[
-/* 场景0：收费站 */
 {lines:[
   {s:'旁白',t:'车子在收费站减速，窗外的收费站让我心跳漏了一拍。',m:{t:'image',id:'图片一'}},
   {s:'旁白',t:'这就是我接下来要待三年的地方。'}
 ],next:1},
-
-/* 场景1：教室发呆 */
 {lines:[
   {s:'小郑',t:'发呆……',m:{t:'image',id:'图片二'}}
 ],next:2},
-
-/* 场景2：宿舍走廊 */
 {lines:[
   {s:'母亲',t:'寝室怎么走啊，先把这些东西放掉，再去教室？',m:{t:'image',id:'图片三'}},
   {s:'小郑',t:'507，那肯定是5楼呀。'}
 ],next:3},
-
-/* 场景3：推开宿舍门 */
 {lines:[
   {s:'旁白',t:'推开那扇门的时候，它发出了一声很老的吱呀。',m:{t:'image',id:'图片四'}},
   {s:'内心',t:'里面已经有人了。'},
   {s:'旁白',t:'放好行李以后，前往教室。',m:{t:'image',id:'图片五'}},
   {s:'内心',t:'他真勤快，居然第一件事就是套垃圾袋。'}
 ],next:4},
-
-/* 场景4：教室，选项 */
 {lines:[
   {s:'旁白',t:'走进教室的一刻，班里有一半的座位都被坐了。',m:{t:'image',id:'图片六'}},
   {s:'内心',t:'讲台上那个箱子我猜是手机保管箱。'},
@@ -414,30 +525,22 @@ var SCENES=[
   {t:'B. 犹豫一下，偷偷把手机藏裤兜里',next:6,ach:'a3'},
   {t:'C. 举手问老师：老年机也要交吗？',next:7,ach:'a4'}
 ]},
-
-/* 场景5：选项A结果 */
 {lines:[
   {s:'小郑',t:'（乖乖把手机放进箱子里）'},
   {s:'老师',t:'很好，找个位置坐下吧。'},
   {s:'内心',t:'三好学生，从今天开始。'}
 ],next:8},
-
-/* 场景6：选项B结果 */
 {lines:[
   {s:'小郑',t:'（犹豫了一下，偷偷把手机塞进裤兜）'},
   {s:'内心',t:'应该……不会被发现吧？'},
   {s:'旁白',t:'心跳比刚才在收费站的时候还快。'}
 ],next:8},
-
-/* 场景7：选项C结果 */
 {lines:[
   {s:'小郑',t:'老师，老年机也要交吗？'},
   {s:'老师',t:'（愣了一下）……老年机？那倒不用。'},
   {s:'旁白',t:'班里响起一阵低低的笑声。'},
   {s:'内心',t:'很好，成功引起了全班的注意。'}
 ],next:8},
-
-/* 场景8：第一章完 */
 {lines:[
   {s:'旁白',t:'—— 第一章 · 完 ——'}
 ],end:true}
@@ -858,6 +961,9 @@ function runTests(){
   ok(SCENES.end===true,'结束标记');
   ok(!!document.getElementById('app'),'伪横屏容器');
   ok(!!document.getElementById('rotate-hint'),'提示条存在');
+  ok(!!document.getElementById('cz-egg'),'彩蛋界面');
+  ok(!!document.querySelector('.char-name-plate'),'外置姓名牌');
+  ok(!!document.getElementById('invite-mask'),'邀请码遮罩');
   rm('ach');unlockAch('a1',true);var a=ld('ach',{});ok(a.a1===true,'成就解锁(静默)');
   rm('gal');unlockGal('图片一',true);unlockGal('图片二',true);unlockGal('图片三',true);unlockGal('图片四',true);unlockGal('图片五',true);
   var g=ld('gal',{});ok(g['图片一']&&g['图片二']&&g['图片三']&&g['图片四']&&g['图片五'],'图鉴解锁5个(静默)');
@@ -865,7 +971,13 @@ function runTests(){
   rm('ach');rm('gal');rm('save');rm('set');
   alert('测试结果：通过 '+p+' / 失败 '+f+'\n\n'+r.join('\n'));
 }
+document.addEventListener('keydown',function(e){
+  var t=e.target;
+  if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT'||t.tagName==='TEXTAREA'))return;
+  if(e.key==='t'||e.key==='T'){runTests()}
+});
 
+initInvite();
 refreshHome();
 bgmUpdate();
 updateHint();
