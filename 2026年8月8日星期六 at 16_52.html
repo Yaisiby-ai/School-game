@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>青春纪事</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/smiley-sans/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/ma-shan-zheng/index.css">
+<style>
+:root{
+  --f-story:'霞鹜文楷','LXGW WenKai','Kaiti SC','STKaiti','KaiTi','楷体',serif;
+  --f-ui:'霞鹜文楷GB','LXGW WenKai GB','LXGW WenKai','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;
+  --f-title:'得意黑','Smiley Sans','ZCOOL KuaiLe','STHeiti','Microsoft YaHei',cursive;
+  --f-brush:'Ma Shan Zheng','马善政毛笔楷书','Kaiti SC','STKaiti','KaiTi','楷体',cursive;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;position:fixed;top:0;left:0}
+body{font-family:var(--f-ui);background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);color:#f0e6d3;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
+
+.rotate-hint{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,15,26,.96);z-index:9999;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px}
+.rotate-hint .icon{font-size:4em;margin-bottom:20px;animation:rotatePhone 2s ease-in-out infinite}
+.rotate-hint p{font-size:1.3em;color:#f0e6d3;line-height:1.6}
+.rotate-hint small{color:#a0a0b0;margin-top:10px;font-size:1em}
+@keyframes rotatePhone{0%,100%{transform:rotate(0deg)}50%{transform:rotate(90deg)}}
+@media (orientation:portrait){.rotate-hint{display:flex}.page{display:none!important}}
+@media (orientation:landscape){.rotate-hint{display:none}}
+
+.page{display:none;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;position:absolute;top:0;left:0;padding:2vh 3vw}
+.page.active{display:flex}
+
+#pg-home{
+  background-image:
+    linear-gradient(rgba(12,12,28,.55),rgba(12,12,28,.72)),
+    url('images/bg.jpg'),
+    url('bg.jpg'),
+    linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);
+  background-size:cover,cover,cover,auto;
+  background-position:center,center,center,center;
+  background-repeat:no-repeat,no-repeat,no-repeat,no-repeat;
+}
+.home-title-area{position:absolute;left:6vw;top:50%;transform:translateY(-50%);display:flex;align-items:flex-start;gap:1.6vw}
+.brush-title{writing-mode:vertical-rl;font-family:var(--f-brush);font-weight:400;font-size:clamp(3em,12vh,6em);color:#f5f0e6;letter-spacing:.15em;text-shadow:0 3px 22px rgba(0,0,0,.65)}
+.title-side{display:flex;gap:.9vw;align-items:flex-start;padding-top:.7em}
+.sub-v{writing-mode:vertical-rl;font-size:clamp(.85em,2.2vh,1.1em);color:rgba(245,240,230,.7);letter-spacing:.35em;font-family:var(--f-story)}
+.seal{writing-mode:vertical-rl;background:#9e2b2b;color:#fff;font-family:var(--f-brush);font-size:clamp(.75em,1.9vh,.95em);padding:.45em .35em;border-radius:4px;box-shadow:0 2px 10px rgba(0,0,0,.45)}
+.home-center{position:absolute;left:50%;bottom:5vh;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:1.6vh}
+.guide{font-style:italic;color:rgba(245,240,230,.6);font-size:clamp(.8em,1.9vh,.95em);text-align:center;font-family:var(--f-story)}
+.btn-ghost{background:transparent;border:1px solid rgba(255,255,255,.45);color:#f0e6d3;padding:clamp(11px,1.8vh,16px) 0;width:clamp(220px,32vw,320px);font-size:clamp(1em,2.4vh,1.25em);letter-spacing:.4em;text-indent:.4em;border-radius:3px;cursor:pointer;font-family:inherit;transition:all .3s}
+.btn-ghost:active{background:rgba(255,255,255,.15);border-color:#e94560}
+.btn-ghost:disabled{opacity:.3;cursor:not-allowed}
+.home-func{position:absolute;right:3vw;bottom:4vh;display:flex;flex-direction:column;gap:1vh}
+.home-func button{background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.18);color:rgba(240,230,211,.85);padding:clamp(8px,1.4vh,12px) clamp(12px,1.8vw,18px);border-radius:8px;font-size:clamp(.8em,1.9vh,.95em);cursor:pointer;font-family:inherit;transition:all .25s;text-align:center}
+.home-func button:active{background:rgba(255,255,255,.15)}
+.home-meta{position:absolute;left:2.5vw;bottom:6vh;display:flex;gap:1.4em;font-size:clamp(.7em,1.6vh,.85em);color:rgba(240,230,211,.5)}
+.version-tag{position:absolute;left:2.5vw;bottom:2.2vh;font-size:clamp(.6em,1.4vh,.75em);color:rgba(240,230,211,.28);cursor:pointer}
+
+.fullscreen-btn{position:fixed;top:1.5vh;right:1.5vw;z-index:50;padding:clamp(8px,1.5vh,12px) clamp(14px,2vw,20px);background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.3);border-radius:8px;color:#fff;cursor:pointer;font-family:inherit;font-size:clamp(.8em,1.8vh,.95em);display:block}
+.fullscreen-btn.hidden{display:none}
+.music-btn{position:fixed;top:1.5vh;left:1.5vw;z-index:50;padding:clamp(8px,1.5vh,12px) clamp(14px,2vw,20px);background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.3);border-radius:8px;color:#fff;cursor:pointer;font-family:inherit;font-size:clamp(.9em,2vh,1.1em);display:block}
+.music-btn.hidden{display:none}
+
+#pg-game{justify-content:flex-end;padding-bottom:2vh}
+.char-area{flex:1;display:flex;align-items:center;justify-content:center;font-size:clamp(3em,8vh,5em);opacity:.3;width:100%}
+.dialogue-box{background:rgba(180,180,190,.16);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);margin:0 auto;padding:clamp(14px,2.2vh,22px) clamp(20px,3vw,32px);padding-bottom:clamp(26px,4vh,38px);border-radius:14px;border:1px solid rgba(255,255,255,.18);min-height:clamp(90px,16vh,130px);cursor:pointer;width:min(92%,760px);position:relative;z-index:5}
+.char-name{font-family:var(--f-story);font-weight:bold;color:#ff8aa0;margin-bottom:.8vh;font-size:clamp(1em,2.2vh,1.25em)}
+.dlg-text{font-family:var(--f-story);line-height:1.7;font-size:clamp(1em,2.3vh,1.2em);color:#f3f1ea}
+.special-line{font-family:var(--f-title);letter-spacing:.1em;color:#f4d03f}
+.dlg-hint{position:absolute;right:clamp(10px,1.5vw,16px);bottom:clamp(6px,1vh,10px);font-size:clamp(.62em,1.4vh,.78em);color:rgba(255,255,255,.38);letter-spacing:.12em;font-family:var(--f-ui)}
+.choices{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:none;flex-direction:column;gap:1.5vh;z-index:10;width:min(85%,520px)}
+.choices.show{display:flex}
+.choice-btn{padding:clamp(16px,2.5vh,24px) clamp(24px,4vw,40px);background:rgba(83,52,131,.92);border:2px solid #e94560;border-radius:10px;color:#fff;cursor:pointer;font-size:clamp(1em,2.2vh,1.2em);font-family:inherit;text-align:center;transition:all .2s;line-height:1.4}
+.choice-btn:active{background:#e94560;transform:scale(.98)}
+.toolbar{position:absolute;top:1.5vh;right:1.5vw;display:flex;flex-direction:column;align-items:center;gap:1vh;z-index:15}
+.toolbar button{width:clamp(40px,6vh,54px);height:clamp(40px,6vh,54px);border:none;background:transparent;color:rgba(255,255,255,.85);cursor:pointer;font-size:clamp(1.3em,2.8vh,1.7em);display:flex;align-items:center;justify-content:center;transition:all .2s;text-shadow:0 1px 6px rgba(0,0,0,.6)}
+.toolbar button:active{transform:scale(1.18);color:#e94560}
+.toolbar .tb-text{width:auto;height:auto;border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:clamp(6px,1vh,10px) clamp(12px,1.6vw,16px);font-size:clamp(.8em,1.9vh,.95em);font-family:inherit;letter-spacing:.15em}
+.btn-back{position:absolute;top:1.5vh;left:1.5vw;padding:clamp(10px,1.8vh,16px) clamp(18px,3vw,28px);background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.3);border-radius:8px;color:#fff;cursor:pointer;z-index:15;font-family:inherit;font-size:clamp(.9em,2vh,1.1em)}
+
+.scene-bg{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;transition:opacity .6s;overflow:hidden}
+.scene-bg .bg-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1vh}
+.scene-bg .bg-icon{font-size:clamp(3em,10vh,6em);opacity:.2}
+.scene-bg .bg-label{font-size:clamp(.8em,2vh,1em);color:rgba(255,255,255,.25)}
+
+.audio-indicator{position:absolute;top:1.5vh;left:clamp(130px,18vw,200px);z-index:16;display:none;align-items:center;gap:.5vw;background:rgba(0,0,0,.55);padding:clamp(6px,1vh,10px) clamp(12px,2vw,18px);border-radius:20px;border:1px solid rgba(255,255,255,.15)}
+.audio-indicator.show{display:flex}
+.audio-indicator .a-icon{font-size:clamp(1em,2vh,1.3em);animation:pulse 1.5s infinite}
+.audio-indicator .a-label{font-size:clamp(.7em,1.6vh,.85em);color:#a0a0b0;white-space:nowrap}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+.slot-mask{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.55);z-index:120;display:none;align-items:center;justify-content:center}
+.slot-mask.show{display:flex}
+.slot-panel{background:rgba(20,22,34,.88);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.2);border-radius:14px;width:min(92%,560px);padding:clamp(14px,2.5vh,22px);font-family:var(--f-ui)}
+.slot-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5vh;color:#e94560;font-size:clamp(1.05em,2.4vh,1.3em);letter-spacing:.1em}
+.slot-close{background:transparent;border:none;color:#f0e6d3;font-size:1.1em;cursor:pointer;padding:4px 8px}
+.slot-list{display:flex;flex-direction:column;gap:1vh;max-height:62vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.slot-row{display:flex;justify-content:space-between;align-items:center;padding:clamp(10px,1.8vh,14px) clamp(12px,2vw,18px);border:1px solid rgba(255,255,255,.18);border-radius:10px;background:rgba(255,255,255,.06);cursor:pointer;transition:all .2s}
+.slot-row:active{background:rgba(255,255,255,.15)}
+.slot-row .slot-name{font-weight:bold;color:#f0e6d3}
+.slot-row .slot-info{color:#a0a0b0;font-size:clamp(.75em,1.8vh,.9em)}
+.slot-row.empty .slot-info{color:rgba(78,204,163,.8)}
+.slot-row.off{opacity:.35;cursor:not-allowed}
+
+.btn{padding:clamp(14px,2.2vh,22px) clamp(36px,6vw,64px);font-size:clamp(1.05em,2.3vh,1.3em);border:none;border-radius:10px;cursor:pointer;margin:.6vh .5vw;transition:all .2s;font-family:inherit;min-width:8em}
+.btn:active{transform:scale(.97)}
+.btn-p{background:#e94560;color:#fff}
+.btn-s{background:#533483;color:#fff}
+.btn-d{background:#c0392b;color:#fff}
+.panel{background:rgba(255,255,255,.05);padding:clamp(18px,3vh,28px);border-radius:14px;width:min(92%,440px)}
+.panel label{display:block;margin:1.5vh 0 .8vh;color:#a0a0b0;font-size:clamp(.9em,2vh,1.05em)}
+.panel input[type=range]{width:100%;height:clamp(24px,4vh,32px);cursor:pointer}
+.panel select{padding:clamp(8px,1.5vh,12px) clamp(12px,2vw,18px);background:#16213e;color:#f0e6d3;border:1px solid #533483;border-radius:6px;font-size:clamp(.9em,2vh,1.05em);width:100%}
+.panel input[type=checkbox]{width:clamp(20px,3.5vh,26px);height:clamp(20px,3.5vh,26px);cursor:pointer;vertical-align:middle;margin-right:8px}
+.danger-zone{border-top:1px solid rgba(233,69,96,.3);padding-top:1.5vh;margin-top:1.5vh}
+
+.list{width:min(92%,600px);max-height:68vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.ach-item{display:flex;align-items:center;gap:1.2vw;padding:clamp(10px,1.8vh,14px);background:rgba(255,255,255,.05);border-radius:10px;margin-bottom:.8vh}
+.ach-item.on{border-left:4px solid #4ecca3}
+.ach-item.off{border-left:4px solid #555;opacity:.5}
+.ach-item .icon{font-size:clamp(1.4em,3vh,1.8em)}
+.ach-item b{font-size:clamp(.95em,2vh,1.1em)}
+.ach-item small{color:#a0a0b0;font-size:clamp(.75em,1.7vh,.9em)}
+
+.tabs{display:flex;gap:1vw;margin-bottom:1.5vh}
+.tab{padding:clamp(10px,1.8vh,16px) clamp(20px,3vw,32px);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;color:#f0e6d3;cursor:pointer;font-family:inherit;font-size:clamp(.9em,2vh,1.05em)}
+.tab.on{background:#e94560;border-color:#e94560}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2vw;width:min(92%,600px)}
+.g-item{aspect-ratio:1;background:rgba(255,255,255,.1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:clamp(1.4em,3vh,1.8em);flex-direction:column;gap:.4vh;position:relative;overflow:hidden}
+.g-item>span{font-size:.38em;color:#a0a0b0}
+.g-item.on{border:2px solid #4ecca3}
+.g-item.off{opacity:.3}
+.g-item .g-img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:2}
+.g-item .g-emoji{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1.6em;z-index:1}
+.g-item .g-name{position:absolute;bottom:0;left:0;width:100%;background:rgba(0,0,0,.5);color:#e8e8e8;font-size:clamp(.6em,1.5vh,.8em);padding:2px 0;text-align:center;z-index:3}
+
+.credits-box{text-align:center}
+.avatar{width:clamp(70px,12vh,90px);height:clamp(70px,12vh,90px);border-radius:50%;background:#533483;margin:0 auto 1.5vh;display:flex;align-items:center;justify-content:center;font-size:clamp(1.8em,4vh,2.4em)}
+.credits-name{font-size:clamp(1.2em,2.6vh,1.5em);color:#e94560;margin-bottom:1vh}
+.credits-bio{color:#a0a0b0;font-size:clamp(.85em,1.9vh,1em);line-height:1.6}
+
+h2{color:#e94560;margin-bottom:1.5vh;font-size:clamp(1.4em,3.2vh,1.8em)}
+
+.mc-toast{position:fixed;top:8vh;left:-340px;z-index:300;display:flex;align-items:center;gap:14px;background:#212121;border:2px solid #5a5a5a;box-shadow:inset 0 0 0 2px #131313,0 4px 12px rgba(0,0,0,.55);padding:12px 22px 12px 14px;border-radius:2px;animation:mcSlide 4.2s cubic-bezier(.22,.61,.36,1) forwards;min-width:240px}
+.mc-toast .mc-icon{font-size:1.9em;line-height:1}
+.mc-toast .mc-body{display:flex;flex-direction:column;gap:3px}
+.mc-toast .mc-head{font-size:.8em;color:#ffff55;letter-spacing:.05em;font-family:var(--f-ui)}
+.mc-toast .mc-name{font-size:1.05em;color:#ffffff;font-weight:bold}
+@keyframes mcSlide{
+  0%{left:-340px;opacity:0}
+  12%{left:2.5vw;opacity:1}
+  78%{left:2.5vw;opacity:1}
+  100%{left:-340px;opacity:0}
+}
+
+.toast{position:fixed;top:2vh;left:50%;transform:translateX(-50%);background:rgba(78,204,163,.92);color:#fff;padding:clamp(10px,1.8vh,14px) clamp(20px,3vw,28px);border-radius:10px;z-index:200;animation:tf 3s forwards;font-size:clamp(.9em,2vh,1.05em)}
+.toast.err{background:rgba(233,69,96,.92)}
+@keyframes tf{0%{opacity:0;transform:translateX(-50%) translateY(-10px)}10%{opacity:1;transform:translateX(-50%) translateY(0)}80%{opacity:1}100%{opacity:0}}
+</style>
+</head>
+<body>
+
+<div class="rotate-hint">
+  <div class="icon">📱</div>
+  <p>请旋转手机到横屏模式</p>
+  <small>本游戏为横屏体验设计</small>
+</div>
+
+<button class="fullscreen-btn" id="fs-btn" onclick="vibrate(15);tryFullscreen()">⛶ 全屏</button>
+<button class="music-btn" id="music-btn" onclick="vibrate(15);toggleBgm()">🎵</button>
+
+<audio id="bgm" src="首页音乐.mp3" loop preload="auto"></audio>
+
+<!-- 首页 -->
+<div class="page active" id="pg-home">
+  <div class="home-title-area">
+    <h1 class="brush-title">青春纪事</h1>
+    <div class="title-side">
+      <p class="sub-v">未命名篇章</p>
+      <span class="seal">伊</span>
+    </div>
+  </div>
+  <div class="home-center">
+    <p class="guide" id="guide"></p>
+    <button class="btn-ghost" onclick="vibrate(30);startGame()">开始游戏</button>
+    <button class="btn-ghost" id="btn-cont" onclick="vibrate(30);contGame()" disabled>继续游戏</button>
+    <button class="btn-ghost" onclick="vibrate(30);openSlots('load')">读档</button>
+  </div>
+  <div class="home-func">
+    <button onclick="vibrate(20);go('settings')">⚙️ 设置</button>
+    <button onclick="vibrate(20);go('ach')">🏆 成就</button>
+    <button onclick="vibrate(20);go('gallery')">📖 图鉴</button>
+    <button onclick="vibrate(20);go('credits')">👤 制作人</button>
+  </div>
+  <div class="home-meta">
+    <span id="s-prog">进度: 未开始</span>
+    <span id="s-ach">成就: 0/5</span>
+    <span id="s-gal">图鉴: 0/6</span>
+  </div>
+  <p class="version-tag" onclick="vibrate(20);runTests()">v2.3</p>
+</div>
+
+<!-- 游戏页 -->
+<div class="page" id="pg-game">
+  <div class="scene-bg" id="scene-bg"></div>
+
+  <div class="audio-indicator" id="audio-ind">
+    <span class="a-icon">🎵</span>
+    <span class="a-label" id="audio-label">播放中</span>
+  </div>
+
+  <div class="toolbar">
+    <button class="tb-text" onclick="vibrate(15);openSlots('save')">存档</button>
+    <button class="tb-text" onclick="vibrate(15);openSlots('load')">读档</button>
+    <button onclick="vibrate(15);go('settings')" title="设置">⚙️</button>
+    <button onclick="vibrate(15);toggleAuto()" title="自动">▶️</button>
+    <button onclick="vibrate(15);showHistory()" title="回顾">📜</button>
+    <button onclick="vibrate(15);go('ach')" title="成就">🏆</button>
+  </div>
+  <button class="btn-back" onclick="vibrate(15);saveGame();goBack()">← 返回</button>
+  <div class="char-area" id="char-icon">🎭</div>
+  <div class="dialogue-box" onclick="vibrate(10);advance()">
+    <div class="char-name" id="c-name"></div>
+    <div class="dlg-text" id="dlg-text"></div>
+    <div class="dlg-hint">点击对话框继续</div>
+  </div>
+  <div class="choices" id="choices"></div>
+</div>
+
+<!-- 存档/读档面板 -->
+<div class="slot-mask" id="slot-mask" onclick="if(event.target===this)closeSlots()">
+  <div class="slot-panel">
+    <div class="slot-head"><span id="slot-title">存档</span><button class="slot-close" onclick="vibrate(10);closeSlots()">✕</button></div>
+    <div class="slot-list" id="slot-list"></div>
+  </div>
+</div>
+
+<!-- 设置页 -->
+<div class="page" id="pg-settings">
+  <h2>数据与设置</h2>
+  <div class="panel">
+    <label>音量: <span id="vol-v">80</span></label>
+    <input type="range" min="0" max="100" value="80" oninput="vibrate(5);setVol(this.value)">
+    <label>文字速度:</label>
+    <select onchange="vibrate(15);setSpeed(this.value)"><option value="slow">慢</option><option value="normal" selected>正常</option><option value="fast">快</option></select>
+    <label><input type="checkbox" onchange="vibrate(15);setAuto(this.checked)"> 自动播放</label>
+    <div class="danger-zone">
+      <button class="btn btn-d" onclick="vibrate(30);resetAll()">重置进度</button>
+    </div>
+  </div>
+  <button class="btn-back" style="position:relative;top:auto;left:auto;margin-top:2vh" onclick="vibrate(15);goBack()">← 返回</button>
+</div>
+
+<!-- 成就页 -->
+<div class="page" id="pg-ach">
+  <h2>成就</h2>
+  <div class="list" id="ach-list"></div>
+  <button class="btn-back" style="position:relative;top:auto;left:auto;margin-top:2vh" onclick="vibrate(15);goBack()">← 返回</button>
+</div>
+
+<!-- 图鉴页 -->
+<div class="page" id="pg-gallery">
+  <h2>图鉴</h2>
+  <div class="tabs">
+    <button class="tab on" onclick="vibrate(15);showGal('image',this)">📷 照片</button>
+    <button class="tab" onclick="vibrate(15);showGal('video',this)">🎬 视频</button>
+    <button class="tab" onclick="vibrate(15);showGal('audio',this)">🎵 录音</button>
+  </div>
+  <div class="grid" id="gal-grid"></div>
+  <button class="btn-back" style="position:relative;top:auto;left:auto;margin-top:2vh" onclick="vibrate(15);goBack()">← 返回</button>
+</div>
+
+<!-- 制作人页 -->
+<div class="page" id="pg-credits">
+  <h2>制作人</h2>
+  <div class="credits-box">
+    <div class="avatar">👤</div>
+    <p class="credits-name">伊Aisby</p>
+    <p class="credits-bio">这里记录着制作人的话...<br>占位符版本，待正式内容替换。</p>
+  </div>
+  <button class="btn-back" style="position:relative;top:auto;left:auto;margin-top:2vh" onclick="vibrate(15);goBack()">← 返回</button>
+</div>
+
+<script>
+function vibrate(ms){if(navigator.vibrate)navigator.vibrate(ms)}
+
+function tryFullscreen(){
+  var el=document.documentElement;
+  if(el.requestFullscreen){el.requestFullscreen().then(lockLandscape).catch(function(){})}
+  else if(el.webkitRequestFullscreen){el.webkitRequestFullscreen();lockLandscape()}
+  else{toast('当前浏览器不支持全屏',1)}
+}
+function lockLandscape(){
+  if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(function(){})
+}
+
+var CHAPTER='第一章·入学';
+
+/* ===== 角色 ===== */
+var CHARS={
+  '小郑':{n:'小郑',p:'主角',c:'#5b9bd5',i:'🧑'},
+  '内心':{n:'内心',p:'小郑的内心',c:'#a0a0b0',i:'💭'},
+  '旁白':{n:'旁白',p:'-',c:'#c8c8d0',i:'📖'},
+  '母亲':{n:'母亲',p:'小郑的母亲',c:'#e8a0c0',i:'👩'},
+  '麒麟':{n:'麒麟',p:'室友',c:'#f4d03f',i:'🦄'},
+  '小老鼠':{n:'小老鼠',p:'室友',c:'#4ecca3',i:'🐭'},
+  '老师':{n:'老师',p:'班主任',c:'#e94560',i:'👨‍🏫'}
+};
+
+/* ===== 成就 ===== */
+var ACHS=[
+  {id:'a1',n:'初次相遇',d:'开始游戏，踏入学门',i:'🌸'},
+  {id:'a2',n:'三好学生',d:'选择乖乖上交手机',i:'📱'},
+  {id:'a3',n:'小心思',d:'选择把手机藏起来',i:'🤫'},
+  {id:'a4',n:'幽默大师',d:'问出那个关于老年机的问题',i:'😂'},
+  {id:'a5',n:'第一章完成',d:'通关第一章全部内容',i:'🎓'}
+];
+
+/* ===== 图鉴：图片一~六 ===== */
+var GALS=[
+  {id:'图片一',t:'image',n:'收费站',i:'🛣️'},
+  {id:'图片二',t:'image',n:'教室发呆',i:'😶'},
+  {id:'图片三',t:'image',n:'宿舍走廊',i:'🚪'},
+  {id:'图片四',t:'image',n:'推开宿舍门',i:'🛏️'},
+  {id:'图片五',t:'image',n:'前往教室',i:'🚶'},
+  {id:'图片六',t:'image',n:'教室',i:'🏫'}
+];
+
+/* ===== 剧情 ===== */
+var SCENES=[
+/* 场景0：收费站 */
+{lines:[
+  {s:'旁白',t:'车子在收费站减速，窗外的收费站让我心跳漏了一拍。',m:{t:'image',id:'图片一'}},
+  {s:'旁白',t:'这就是我接下来要待三年的地方。'}
+],next:1},
+
+/* 场景1：教室发呆 */
+{lines:[
+  {s:'小郑',t:'发呆……',m:{t:'image',id:'图片二'}}
+],next:2},
+
+/* 场景2：宿舍走廊 */
+{lines:[
+  {s:'母亲',t:'寝室怎么走啊，先把这些东西放掉，再去教室？',m:{t:'image',id:'图片三'}},
+  {s:'小郑',t:'507，那肯定是5楼呀。'}
+],next:3},
+
+/* 场景3：推开宿舍门 */
+{lines:[
+  {s:'旁白',t:'推开那扇门的时候，它发出了一声很老的吱呀。',m:{t:'image',id:'图片四'}},
+  {s:'内心',t:'里面已经有人了。'},
+  {s:'旁白',t:'放好行李以后，前往教室。',m:{t:'image',id:'图片五'}},
+  {s:'内心',t:'他真勤快，居然第一件事就是套垃圾袋。'}
+],next:4},
+
+/* 场景4：教室，选项 */
+{lines:[
+  {s:'旁白',t:'走进教室的一刻，班里有一半的座位都被坐了。',m:{t:'image',id:'图片六'}},
+  {s:'内心',t:'讲台上那个箱子我猜是手机保管箱。'},
+  {s:'老师',t:'新同学找个位置坐下，手机放到讲台上这个箱子里，放学拿手机。'},
+  {s:'老师',t:'不要偷偷摸摸留在身边，不要一开学就吃个处分嗷。'}
+],choices:[
+  {t:'A. 乖乖上交手机，做个好学生',next:5,ach:'a2',gal:'图片一'},
+  {t:'B. 犹豫一下，偷偷把手机藏裤兜里',next:6,ach:'a3'},
+  {t:'C. 举手问老师：老年机也要交吗？',next:7,ach:'a4'}
+]},
+
+/* 场景5：选项A结果 */
+{lines:[
+  {s:'小郑',t:'（乖乖把手机放进箱子里）'},
+  {s:'老师',t:'很好，找个位置坐下吧。'},
+  {s:'内心',t:'三好学生，从今天开始。'}
+],next:8},
+
+/* 场景6：选项B结果 */
+{lines:[
+  {s:'小郑',t:'（犹豫了一下，偷偷把手机塞进裤兜）'},
+  {s:'内心',t:'应该……不会被发现吧？'},
+  {s:'旁白',t:'心跳比刚才在收费站的时候还快。'}
+],next:8},
+
+/* 场景7：选项C结果 */
+{lines:[
+  {s:'小郑',t:'老师，老年机也要交吗？'},
+  {s:'老师',t:'（愣了一下）……老年机？那倒不用。'},
+  {s:'旁白',t:'班里响起一阵低低的笑声。'},
+  {s:'内心',t:'很好，成功引起了全班的注意。'}
+],next:8},
+
+/* 场景8：第一章完 */
+{lines:[
+  {s:'旁白',t:'—— 第一章 · 完 ——'}
+],end:true}
+];
+
+var GUIDES=[
+  '车子在收费站减速的那一刻，故事开始了。',
+  '507，那肯定是5楼呀。',
+  '推开那扇门的时候，它发出了一声很老的吱呀。',
+  '讲台上那个箱子，我猜是手机保管箱。',
+  '不要一开学就吃个处分嗷。',
+  '他真勤快，居然第一件事就是套垃圾袋。'
+];
+
+function sv(k,v){try{localStorage.setItem('yc_'+k,JSON.stringify(v))}catch(e){}}
+function ld(k,d){try{var j=localStorage.getItem('yc_'+k);return j?JSON.parse(j):(d||null)}catch(e){return d||null}}
+function rm(k){localStorage.removeItem('yc_'+k)}
+
+var scene=0,line=0,typing=false,fullTxt='',ci=0,timer=null,autoOn=false,autoTm=null,hist=[],choiceLog=[];
+var curPage='home',prevPage='home';
+
+function volNow(){var s=ld('set',{});return (s.vol===undefined?80:s.vol)/100}
+
+var bgm=document.getElementById('bgm');
+var bgmMuted=false,bgmTriedAlt=false,audioUnlocked=false,fadeTimer=null;
+bgm.addEventListener('error',function(){
+  if(!bgmTriedAlt){bgmTriedAlt=true;bgm.src='images/首页音乐.mp3'}
+});
+function bgmPlay(){
+  if(fadeTimer){clearInterval(fadeTimer);fadeTimer=null}
+  bgm.volume=volNow();
+  var pr=bgm.play();
+  if(pr&&pr.catch)pr.catch(function(){});
+}
+function bgmFadeOut(){
+  if(fadeTimer)clearInterval(fadeTimer);
+  fadeTimer=setInterval(function(){
+    if(bgm.volume>0.02){bgm.volume=Math.max(0,bgm.volume-0.02)}
+    else{bgm.pause();bgm.volume=volNow();clearInterval(fadeTimer);fadeTimer=null}
+  },60);
+}
+function bgmUpdate(){
+  if(curPage==='game'){bgmFadeOut()}
+  else if(curPage==='home'&&!bgmMuted){bgmPlay()}
+}
+function toggleBgm(){
+  bgmMuted=!bgmMuted;
+  document.getElementById('music-btn').textContent=bgmMuted?'🔇':'🎵';
+  if(bgmMuted){bgmFadeOut()}else if(curPage==='home'){bgmPlay()}
+  toast(bgmMuted?'🔇 音乐：关':'🎵 音乐：开');
+}
+function unlockAudio(){
+  if(audioUnlocked)return;
+  audioUnlocked=true;
+  if(curPage==='home'&&!bgmMuted)bgmPlay();
+}
+document.addEventListener('touchend',unlockAudio,{once:true});
+document.addEventListener('click',unlockAudio,{once:true});
+
+var sfx=new Audio();
+function stopSfx(){
+  try{sfx.pause();sfx.currentTime=0;sfx.removeAttribute('src')}catch(e){}
+}
+function playSfx(id){
+  stopSfx();
+  probe(mediaSrcs(id,['mp3','wav','ogg']),function(url){
+    sfx.src=url;
+    sfx.volume=volNow();
+    var pr=sfx.play();
+    if(pr&&pr.catch)pr.catch(function(){});
+  },function(){});
+}
+
+function mediaSrcs(id,exts){
+  var out=[];
+  for(var e=0;e<exts.length;e++){out.push('images/'+id+'.'+exts[e]);out.push(id+'.'+exts[e])}
+  return out;
+}
+function probe(srcs,onOk,onFail){
+  var i=0;
+  function next(){
+    if(i>=srcs.length){onFail();return}
+    var s=srcs[i],el;
+    if(/\.(jpg|png)$/i.test(s)){el=new Image()}
+    else if(/\.(mp3|wav|ogg)$/i.test(s)){el=new Audio()}
+    else{el=document.createElement('video')}
+    el.onerror=function(){i++;next()};
+    el.onload=function(){onOk(s)};
+    el.onloadeddata=function(){onOk(s)};
+    el.src=s;
+  }
+  next();
+}
+
+function go(p){
+  if(p!==curPage)prevPage=curPage;
+  curPage=p;
+  var ps=document.querySelectorAll('.page');
+  for(var i=0;i<ps.length;i++)ps[i].className='page';
+  document.getElementById('pg-'+p).className='page active';
+  var fsBtn=document.getElementById('fs-btn');
+  var mBtn=document.getElementById('music-btn');
+  if(p==='game'){fsBtn.className='fullscreen-btn hidden'}else{fsBtn.className='fullscreen-btn'}
+  if(p==='home'){mBtn.className='music-btn'}else{mBtn.className='music-btn hidden'}
+  if(p==='home'){refreshHome();clearSceneBg()}
+  if(p==='ach')renderAch();
+  if(p==='gallery')showGal('image');
+  if(p!=='game'){hideAudioInd();stopSfx()}
+  bgmUpdate();
+}
+function goBack(){
+  var target=(prevPage&&prevPage!==curPage)?prevPage:'home';
+  if(curPage==='game'){saveGame();target='home'}
+  go(target);
+}
+
+function refreshHome(){
+  var prog=ld('save');
+  document.getElementById('btn-cont').disabled=!prog;
+  document.getElementById('s-prog').textContent=prog?(prog.done?'进度: 第一章已完成':'进度: 进行中'):'进度: 未开始';
+  var ach=ld('ach',{}),ac=0;for(var k in ach)if(ach[k])ac++;
+  document.getElementById('s-ach').textContent='成就: '+ac+'/5';
+  var gal=ld('gal',{}),gc=0;for(var k in gal)if(gal[k])gc++;
+  document.getElementById('s-gal').textContent='图鉴: '+gc+'/6';
+  document.getElementById('guide').textContent=GUIDES[Math.floor(Math.random()*GUIDES.length)];
+}
+
+var bgToken=0;
+function showSceneBg(media){
+  var bg=document.getElementById('scene-bg');
+  var tk=++bgToken;
+  if(media.t==='image'){
+    probe(mediaSrcs(media.id,['jpg','png']),function(url){
+      if(tk!==bgToken)return;
+      bg.innerHTML='<img src="'+url+'" style="width:100%;height:100%;object-fit:cover">';
+      bg.style.opacity='1';
+    },function(){
+      if(tk!==bgToken)return;
+      bg.innerHTML='<div class="bg-placeholder"><div class="bg-icon">🖼️</div><div class="bg-label">[背景图片] '+media.id+'（放入同名文件后自动显示）</div></div>';
+      bg.style.opacity='1';
+    });
+    unlockGal(media.id,true);
+  }else if(media.t==='video'){
+    probe(mediaSrcs(media.id,['mp4','webm']),function(url){
+      if(tk!==bgToken)return;
+      bg.innerHTML='<video src="'+url+'" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover"></video>';
+      bg.style.opacity='1';
+    },function(){
+      if(tk!==bgToken)return;
+      bg.innerHTML='<div class="bg-placeholder"><div class="bg-icon">🎬</div><div class="bg-label">[背景视频] '+media.id+'（放入同名文件后自动播放）</div></div>';
+      bg.style.opacity='1';
+    });
+  }
+}
+function clearSceneBg(){
+  bgToken++;
+  document.getElementById('scene-bg').innerHTML='';
+  document.getElementById('scene-bg').style.opacity='0';
+  hideAudioInd();
+}
+
+function showAudioInd(id){
+  var el=document.getElementById('audio-ind');
+  document.getElementById('audio-label').textContent='🎵 '+id+' 播放中';
+  el.className='audio-indicator show';
+}
+function hideAudioInd(){
+  document.getElementById('audio-ind').className='audio-indicator';
+}
+
+function isSpecialLine(t){
+  return t.indexOf('——')===0||t.indexOf('· 完 ·')>=0;
+}
+
+function startGame(){
+  if(ld('save')){if(!confirm('开始新游戏将覆盖现有进度，确定吗？'))return;rm('save')}
+  scene=0;line=0;hist=[];choiceLog=[];
+  unlockAch('a1');
+  go('game');showLine();
+}
+function contGame(){
+  var s=ld('save');if(!s){toast('没有存档',1);return}
+  scene=s.scene||0;line=s.line||0;hist=s.hist||[];choiceLog=s.choices||[];go('game');showLine();
+}
+function showLine(){
+  if(scene>=SCENES.length){endChapter();return}
+  var sc=SCENES[scene];
+  if(line>=sc.lines.length){advanceScene();return}
+  var l=sc.lines[line],ch=CHARS[l.s]||CHARS['旁白'];
+  document.getElementById('c-name').textContent=ch.n;
+  document.getElementById('c-name').style.color=ch.c;
+  document.getElementById('char-icon').textContent=ch.i;
+  document.getElementById('choices').className='choices';
+  if(l.m){
+    if(l.m.t==='audio'){showAudioInd(l.m.id);playSfx(l.m.id)}
+    else{hideAudioInd();stopSfx();showSceneBg(l.m)}
+  }else{hideAudioInd();stopSfx()}
+  fullTxt=l.t;ci=0;typing=true;
+  clearInterval(timer);
+  var dlgEl=document.getElementById('dlg-text');
+  dlgEl.className='dlg-text'+(isSpecialLine(l.t)?' special-line':'');
+  dlgEl.textContent='';
+  var setObj=ld('set',{spd:'normal'});
+  var spd=setObj.spd==='fast'?15:(setObj.spd==='slow'?80:40);
+  timer=setInterval(function(){
+    if(ci<fullTxt.length){dlgEl.textContent+=fullTxt[ci];ci++}
+    else{clearInterval(timer);typing=false;if(autoOn)autoTm=setTimeout(advance,2000)}
+  },spd);
+  hist.push({s:l.s,t:l.t});
+  saveGame();
+}
+function advance(){
+  if(typing){clearInterval(timer);document.getElementById('dlg-text').textContent=fullTxt;typing=false;return}
+  clearTimeout(autoTm);
+  line++;
+  var sc=SCENES[scene];
+  if(line>=sc.lines.length){advanceScene()}else{showLine()}
+}
+function advanceScene(){
+  var sc=SCENES[scene];
+  if(sc.choices){showChoices(sc.choices);return}
+  if(sc.end){endChapter();return}
+  scene=sc.next;line=0;showLine();
+}
+function showChoices(cs){
+  var box=document.getElementById('choices');box.innerHTML='';
+  for(var i=0;i<cs.length;i++){
+    var b=document.createElement('button');
+    b.className='choice-btn';b.textContent=cs[i].t;
+    b.setAttribute('data-idx',i);
+    b.onclick=function(){
+      vibrate(50);
+      var idx=parseInt(this.getAttribute('data-idx'));
+      var c=cs[idx];
+      choiceLog.push(c.t);
+      if(c.ach)unlockAch(c.ach);
+      if(c.gal)unlockGal(c.gal);
+      document.getElementById('choices').className='choices';
+      scene=c.next;line=0;showLine();
+    };
+    box.appendChild(b);
+  }
+  box.className='choices show';
+}
+function endChapter(){
+  vibrate([100,50,100]);
+  unlockAch('a5');
+  sv('save',{scene:scene,line:line,hist:hist.slice(-30),choices:choiceLog.slice(),done:true});
+  setTimeout(function(){go('home')},2200);
+}
+function saveGame(){sv('save',{scene:scene,line:line,hist:hist.slice(-30),choices:choiceLog.slice(),done:false})}
+function toggleAuto(){autoOn=!autoOn;toast(autoOn?'▶️ 自动：开':'▶️ 自动：关')}
+function showHistory(){
+  var txt='--- 对话回顾 ---\n';
+  var r=hist.slice(-8);
+  for(var i=0;i<r.length;i++)txt+=r[i].s+': '+r[i].t+'\n';
+  alert(txt||'暂无记录');
+}
+
+var slotMode='save';
+function fmtTime(ts){
+  var d=new Date(ts);
+  var mm=('0'+(d.getMonth()+1)).slice(-2),dd=('0'+d.getDate()).slice(-2);
+  var hh=('0'+d.getHours()).slice(-2),mi=('0'+d.getMinutes()).slice(-2);
+  return mm+'/'+dd+' '+hh+':'+mi;
+}
+function openSlots(mode){
+  slotMode=mode;
+  renderSlots();
+  document.getElementById('slot-mask').className='slot-mask show';
+}
+function closeSlots(){
+  document.getElementById('slot-mask').className='slot-mask';
+}
+function renderSlots(){
+  document.getElementById('slot-title').textContent=(slotMode==='save'?'💾 存档':'📂 读档');
+  var html='';
+  for(var i=1;i<=6;i++){
+    var d=ld('slot'+i);
+    if(d){
+      html+='<div class="slot-row on" data-i="'+i+'"><span class="slot-name">存档'+i+'</span><span class="slot-info">'+d.chapter+' - '+fmtTime(d.time)+'</span></div>';
+    }else if(slotMode==='save'){
+      html+='<div class="slot-row empty" data-i="'+i+'"><span class="slot-name">存档'+i+'</span><span class="slot-info">空白槽位 · 点击保存</span></div>';
+    }else{
+      html+='<div class="slot-row off" data-i="'+i+'"><span class="slot-name">存档'+i+'</span><span class="slot-info">空白槽位</span></div>';
+    }
+  }
+  var list=document.getElementById('slot-list');
+  list.innerHTML=html;
+  var rows=list.querySelectorAll('.slot-row');
+  for(var i=0;i<rows.length;i++){
+    rows[i].onclick=function(){
+      var idx=parseInt(this.getAttribute('data-i'));
+      if(slotMode==='save'){doSaveSlot(idx)}else{doLoadSlot(idx)}
+    };
+  }
+}
+function doSaveSlot(i){
+  var old=ld('slot'+i);
+  if(old&&!confirm('存档'+i+' 已有记录（'+old.chapter+' - '+fmtTime(old.time)+'），确定覆盖吗？'))return;
+  sv('slot'+i,{scene:scene,line:line,chapter:CHAPTER,time:Date.now(),ach:ld('ach',{}),gal:ld('gal',{}),choices:choiceLog.slice()});
+  vibrate(30);
+  toast('💾 已保存到 存档'+i);
+  closeSlots();
+}
+function doLoadSlot(i){
+  var d=ld('slot'+i);
+  if(!d){toast('该槽位为空',1);return}
+  scene=d.scene||0;line=d.line||0;
+  choiceLog=d.choices||[];
+  sv('ach',d.ach||{});
+  sv('gal',d.gal||{});
+  hist=[];
+  vibrate(30);
+  closeSlots();
+  go('game');
+  showLine();
+  toast('📂 已读取 存档'+i);
+}
+
+function unlockAch(id,silent){
+  var a=ld('ach',{});
+  if(a[id])return false;
+  a[id]=true;sv('ach',a);
+  if(!silent){
+    var info=null;
+    for(var i=0;i<ACHS.length;i++)if(ACHS[i].id===id)info=ACHS[i];
+    if(info){vibrate([50,30,50]);mcToast(info.i,info.n)}
+  }
+  return true;
+}
+function mcToast(icon,name){
+  var t=document.createElement('div');
+  t.className='mc-toast';
+  t.innerHTML='<span class="mc-icon">'+icon+'</span><div class="mc-body"><span class="mc-head">成就达成！</span><span class="mc-name">'+name+'</span></div>';
+  document.body.appendChild(t);
+  setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t)},4300);
+}
+function renderAch(){
+  var a=ld('ach',{}),html='';
+  for(var i=0;i<ACHS.length;i++){
+    var on=!!a[ACHS[i].id];
+    html+='<div class="ach-item '+(on?'on':'off')+'"><span class="icon">'+(on?ACHS[i].i:'🔒')+'</span><div><b>'+ACHS[i].n+'</b><br><small>'+ACHS[i].d+'</small></div></div>';
+  }
+  document.getElementById('ach-list').innerHTML=html;
+}
+
+function unlockGal(id,silent){
+  var g=ld('gal',{});
+  if(g[id])return false;
+  g[id]=true;sv('gal',g);
+  if(!silent)toast('📖 图鉴解锁：'+getGalName(id));
+  return true;
+}
+function getGalName(id){
+  for(var i=0;i<GALS.length;i++)if(GALS[i].id===id)return GALS[i].n;
+  return id;
+}
+function showGal(type,btn){
+  var tabs=document.querySelectorAll('.tab');
+  for(var i=0;i<tabs.length;i++)tabs[i].className='tab';
+  if(btn)btn.className='tab on';
+  var g=ld('gal',{}),html='';
+  for(var i=0;i<GALS.length;i++){
+    if(GALS[i].t!==type)continue;
+    var on=!!g[GALS[i].id];
+    if(type==='image'&&on){
+      html+='<div class="g-item on"><span class="g-emoji">'+GALS[i].i+'</span><img class="g-img" data-id="'+GALS[i].id+'"><span class="g-name">'+GALS[i].n+'</span></div>';
+    }else{
+      html+='<div class="g-item '+(on?'on':'off')+'">'+(on?GALS[i].i:'🔒')+'<span>'+GALS[i].n+'</span></div>';
+    }
+  }
+  document.getElementById('gal-grid').innerHTML=html;
+  bindGalImgs();
+}
+function bindGalImgs(){
+  var imgs=document.querySelectorAll('.g-img');
+  for(var i=0;i<imgs.length;i++){
+    (function(img){
+      probe(mediaSrcs(img.getAttribute('data-id'),['jpg','png']),function(url){img.src=url},function(){img.style.display='none'});
+    })(imgs[i]);
+  }
+}
+
+function setVol(v){
+  document.getElementById('vol-v').textContent=v;
+  var s=ld('set',{});s.vol=v;sv('set',s);
+  if(curPage!=='game')bgm.volume=v/100;
+  sfx.volume=v/100;
+}
+function setSpeed(v){var s=ld('set',{});s.spd=v;sv('set',s)}
+function setAuto(v){var s=ld('set',{});s.auto=v;sv('set',s)}
+function resetAll(){
+  if(!confirm('确定要重置所有进度吗？（包括6个存档槽位，不可撤销）'))return;
+  vibrate(100);
+  rm('save');rm('ach');rm('gal');rm('set');
+  for(var i=1;i<=6;i++)rm('slot'+i);
+  toast('已重置所有数据');refreshHome();
+}
+
+function toast(msg,err){
+  var t=document.createElement('div');t.className='toast'+(err?' err':'');
+  t.textContent=msg;document.body.appendChild(t);
+  setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t)},3200);
+}
+
+function runTests(){
+  var p=0,f=0,r=[];
+  function ok(c,n){if(c){p++;r.push('✅ '+n)}else{f++;r.push('❌ '+n)}}
+  sv('t1',{a:1});ok(JSON.stringify(ld('t1'))==='{"a":1}','存储读写');
+  rm('t1');ok(ld('t1')===null,'存储删除');
+  ok(ld('nope','def')==='def','默认值');
+  ok(Object.keys(CHARS).length===7,'7个角色');
+  ok(ACHS.length===5,'5个成就');
+  ok(GALS.length===6,'6个图鉴');
+  ok(SCENES.length===9,'9个场景');
+  ok(SCENES.choices&&SCENES.choices.length===3,'分支存在');
+  ok(SCENES.end===true,'结束标记');
+  rm('ach');unlockAch('a1',true);var a=ld('ach',{});ok(a.a1===true,'成就解锁(静默)');
+  rm('gal');unlockGal('图片一',true);unlockGal('图片二',true);unlockGal('图片三',true);unlockGal('图片四',true);unlockGal('图片五',true);
+  var g=ld('gal',{});ok(g['图片一']&&g['图片二']&&g['图片三']&&g['图片四']&&g['图片五'],'图鉴解锁5个(静默)');
+  sv('slot9',{scene:0,line:0,chapter:CHAPTER,time:Date.now(),ach:{},gal:{},choices:[]});ok(!!ld('slot9'),'存档槽读写');rm('slot9');
+  rm('ach');rm('gal');rm('save');rm('set');
+  alert('测试结果：通过 '+p+' / 失败 '+f+'\n\n'+r.join('\n'));
+}
+
+refreshHome();
+bgmUpdate();
+</script>
+</body>
+</html>
