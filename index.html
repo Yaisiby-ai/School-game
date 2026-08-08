@@ -18,13 +18,36 @@
 html,body{width:100%;height:100%;overflow:hidden;position:fixed;top:0;left:0}
 body{font-family:var(--f-ui);background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);color:#f0e6d3;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
 
-.rotate-hint{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,15,26,.96);z-index:9999;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px}
-.rotate-hint .icon{font-size:4em;margin-bottom:20px;animation:rotatePhone 2s ease-in-out infinite}
-.rotate-hint p{font-size:1.3em;color:#f0e6d3;line-height:1.6}
-.rotate-hint small{color:#a0a0b0;margin-top:10px;font-size:1em}
+/* ===== 游戏根容器：竖屏时整体旋转90°，实现"伪横屏" ===== */
+#app{position:absolute;top:0;left:0;width:100vw;height:100vh;overflow:hidden}
+@supports(height:100dvh){#app{width:100dvw;height:100dvh}}
+@media (orientation:portrait){
+  #app{
+    width:100vh;height:100vw;
+    transform:rotate(90deg) translateY(-100%);
+    transform-origin:top left;
+  }
+  @supports(height:100dvh){
+    #app{width:100dvh;height:100dvw}
+  }
+  /* 竖屏伪横屏下的尺寸微调，防止个别面板溢出 */
+  .page{overflow-y:auto;justify-content:safe center}
+  .slot-list{max-height:34vh}
+  .list{max-height:32vh}
+  .grid{width:min(92%,460px)}
+}
+
+/* ===== 横屏提示条：仅提醒，不拦截 ===== */
+.rotate-hint{position:absolute;top:1.6vh;left:50%;transform:translateX(-50%);z-index:9999;
+  display:flex;align-items:center;gap:.6em;
+  background:rgba(0,0,0,.78);border:1px solid rgba(255,255,255,.28);
+  color:#f0e6d3;padding:clamp(8px,1.4vh,12px) clamp(14px,2vw,20px);
+  border-radius:999px;font-size:clamp(.8em,1.9vh,.95em);
+  opacity:0;pointer-events:none;transition:opacity .5s;white-space:nowrap}
+.rotate-hint.show{opacity:1;pointer-events:auto}
+.rotate-hint .rh-icon{display:inline-block;animation:rotatePhone 2s ease-in-out infinite}
+.rotate-hint .rh-close{background:none;border:none;color:rgba(255,255,255,.7);font-size:1em;cursor:pointer;padding:0 0 0 .4em;font-family:inherit}
 @keyframes rotatePhone{0%,100%{transform:rotate(0deg)}50%{transform:rotate(90deg)}}
-@media (orientation:portrait){.rotate-hint{display:flex}.page{display:none!important}}
-@media (orientation:landscape){.rotate-hint{display:none}}
 
 .page{display:none;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;position:absolute;top:0;left:0;padding:2vh 3vw}
 .page.active{display:flex}
@@ -159,10 +182,13 @@ h2{color:#e94560;margin-bottom:1.5vh;font-size:clamp(1.4em,3.2vh,1.8em)}
 </head>
 <body>
 
-<div class="rotate-hint">
-  <div class="icon">📱</div>
-  <p>请旋转手机到横屏模式</p>
-  <small>本游戏为横屏体验设计</small>
+<div id="app">
+
+<!-- 横屏提示条：仅提醒，可关闭，不拦截 -->
+<div class="rotate-hint" id="rotate-hint">
+  <span class="rh-icon">📱</span>
+  <span>旋转手机至横屏体验更佳 · 竖屏也可直接游玩</span>
+  <button class="rh-close" onclick="vibrate(10);dismissHint()">✕</button>
 </div>
 
 <button class="fullscreen-btn" id="fs-btn" onclick="vibrate(15);tryFullscreen()">⛶ 全屏</button>
@@ -196,7 +222,7 @@ h2{color:#e94560;margin-bottom:1.5vh;font-size:clamp(1.4em,3.2vh,1.8em)}
     <span id="s-ach">成就: 0/5</span>
     <span id="s-gal">图鉴: 0/6</span>
   </div>
-  <p class="version-tag" onclick="vibrate(20);runTests()">v2.3</p>
+  <p class="version-tag" onclick="vibrate(20);runTests()">v2.4</p>
 </div>
 
 <!-- 游戏页 -->
@@ -280,8 +306,33 @@ h2{color:#e94560;margin-bottom:1.5vh;font-size:clamp(1.4em,3.2vh,1.8em)}
   <button class="btn-back" style="position:relative;top:auto;left:auto;margin-top:2vh" onclick="vibrate(15);goBack()">← 返回</button>
 </div>
 
+</div><!-- /app -->
+
 <script>
 function vibrate(ms){if(navigator.vibrate)navigator.vibrate(ms)}
+
+/* ===== 横屏提示：只提醒不拦截 ===== */
+var mqPortrait=window.matchMedia('(orientation: portrait)');
+var hintDismissed=false,hintTimer=null;
+function updateHint(){
+  var hint=document.getElementById('rotate-hint');
+  if(!hint)return;
+  if(mqPortrait.matches&&!hintDismissed){
+    hint.classList.add('show');
+    clearTimeout(hintTimer);
+    hintTimer=setTimeout(function(){hint.classList.remove('show')},6500);
+  }else{
+    hint.classList.remove('show');
+  }
+}
+function dismissHint(){
+  hintDismissed=true;
+  clearTimeout(hintTimer);
+  document.getElementById('rotate-hint').classList.remove('show');
+}
+function onOrientationMQ(){updateHint()}
+if(mqPortrait.addEventListener){mqPortrait.addEventListener('change',onOrientationMQ)}
+else if(mqPortrait.addListener){mqPortrait.addListener(onOrientationMQ)}
 
 function tryFullscreen(){
   var el=document.documentElement;
@@ -805,6 +856,8 @@ function runTests(){
   ok(SCENES.length===9,'9个场景');
   ok(SCENES.choices&&SCENES.choices.length===3,'分支存在');
   ok(SCENES.end===true,'结束标记');
+  ok(!!document.getElementById('app'),'伪横屏容器');
+  ok(!!document.getElementById('rotate-hint'),'提示条存在');
   rm('ach');unlockAch('a1',true);var a=ld('ach',{});ok(a.a1===true,'成就解锁(静默)');
   rm('gal');unlockGal('图片一',true);unlockGal('图片二',true);unlockGal('图片三',true);unlockGal('图片四',true);unlockGal('图片五',true);
   var g=ld('gal',{});ok(g['图片一']&&g['图片二']&&g['图片三']&&g['图片四']&&g['图片五'],'图鉴解锁5个(静默)');
@@ -815,6 +868,7 @@ function runTests(){
 
 refreshHome();
 bgmUpdate();
+updateHint();
 </script>
 </body>
 </html>
