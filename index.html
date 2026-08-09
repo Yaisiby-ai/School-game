@@ -8,979 +8,1190 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/smiley-sans/style.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/ma-shan-zheng/index.css">
 <style>
-:root{
-  --f-story:'霞鹜文楷','LXGW WenKai','Kaiti SC','STKaiti','KaiTi','楷体',serif;
-  --f-ui:'霞鹜文楷GB','LXGW WenKai GB','LXGW WenKai','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;
-  --f-title:'得意黑','Smiley Sans','ZCOOL KuaiLe','STHeiti','Microsoft YaHei',cursive;
-  --f-brush:'Ma Shan Zheng','马善政毛笔楷书','Kaiti SC','STKaiti','KaiTi','楷体',cursive;
-}
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{width:100%;height:100%;overflow:hidden;position:fixed;top:0;left:0}
-body{font-family:var(--f-ui);background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);color:#f0e6d3;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
-
-#app{position:absolute;top:0;left:0;width:100vw;height:100vh;overflow:hidden}
-@supports(height:100dvh){#app{width:100dvw;height:100dvh}}
-@media (orientation:portrait){
-  #app{
-    width:100vh;height:100vw;
-    transform:rotate(90deg) translateY(-100%);
-    transform-origin:top left;
+  :root {
+    --f-story: '霞鹜文楷', 'LXGW WenKai', 'Kaiti SC', 'STKaiti', 'KaiTi', '楷体', serif;
+    --f-ui: '霞鹜文楷GB', 'LXGW WenKai GB', 'LXGW WenKai', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    --f-title: '得意黑', 'Smiley Sans', 'ZCOOL KuaiLe', 'STHeiti', 'Microsoft YaHei', cursive;
+    --f-brush: 'Ma Shan Zheng', '马善政毛笔楷书', 'Kaiti SC', 'STKaiti', 'KaiTi', '楷体', cursive;
+    --bg-glass: rgba(180, 180, 190, .16);
+    --border-glass: rgba(255, 255, 255, .18);
   }
-  @supports(height:100dvh){
-    #app{width:100dvh;height:100dvw}
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { width: 100%; height: 100%; overflow: hidden; position: fixed; top: 0; left: 0; }
+  body { font-family: var(--f-ui); background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); color: #f0e6d3; display: flex; align-items: center; justify-content: center; touch-action: manipulation; }
+  #app { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; overflow: hidden; }
+  @supports (height: 100dvh) { #app { width: 100dvw; height: 100dvh; } }
+
+  /* ===== 横屏提示 ===== */
+  .rotate-hint { position: absolute; top: 1.6vh; left: 50%; transform: translateX(-50%); z-index: 40; display: flex; align-items: center; gap: .6em; background: rgba(0,0,0,.78); border: 1px solid rgba(255,255,255,.28); color: #f0e6d3; padding: clamp(8px,1.4vh,12px) clamp(14px,2vw,20px); border-radius: 999px; font-size: clamp(.8em,1.9vh,.95em); opacity: 0; pointer-events: none; transition: opacity .5s; white-space: nowrap; }
+  .rotate-hint.show { opacity: 1; pointer-events: auto; }
+  .rotate-hint .rh-icon { display: inline-block; animation: rotatePhone 2s ease-in-out infinite; }
+  .rotate-hint .rh-close { background: none; border: none; color: rgba(255,255,255,.7); font-size: 1em; cursor: pointer; padding: 0 0 0 .4em; font-family: inherit; }
+  @keyframes rotatePhone { 0%,100% { transform: rotate(0deg); } 50% { transform: rotate(90deg); } }
+
+  /* ===== 页面通用 ===== */
+  .page { display: none; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; position: absolute; top: 0; left: 0; padding: 2vh 3vw; }
+  .page.active { display: flex; }
+
+  /* ===== 首页 ===== */
+  #pg-home { background-image: linear-gradient(rgba(12,12,28,.55), rgba(12,12,28,.72)), url('shouye.jpg'), url('shouye.jpg'), linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); background-size: cover, cover, cover, auto; background-position: center; background-repeat: no-repeat; }
+  .home-title-area { position: absolute; left: 6vw; top: 50%; transform: translateY(-50%); display: flex; align-items: flex-start; gap: 1.6vw; }
+  .brush-title { writing-mode: vertical-rl; font-family: var(--f-brush); font-weight: 400; font-size: clamp(3em, 12vh, 6em); color: #f5f0e6; letter-spacing: .15em; text-shadow: 0 3px 22px rgba(0,0,0,.65); }
+  .title-side { display: flex; gap: .9vw; align-items: flex-start; padding-top: .7em; }
+  .sub-v { writing-mode: vertical-rl; font-size: clamp(.85em,2.2vh,1.1em); color: rgba(245,240,230,.7); letter-spacing: .35em; font-family: var(--f-story); animation: float 3s ease-in-out infinite; }
+  .seal { writing-mode: vertical-rl; background: #9e2b2b; color: #fff; font-family: var(--f-brush); font-size: clamp(.75em,1.9vh,.95em); padding: .45em .35em; border-radius: 4px; box-shadow: 0 2px 10px rgba(0,0,0,.45); animation: float 3s ease-in-out infinite .6s; }
+  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+  .home-center { position: absolute; left: 50%; bottom: 5vh; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 1.6vh; }
+  .guide { font-style: italic; color: rgba(245,240,230,.6); font-size: clamp(.8em,1.9vh,.95em); text-align: center; font-family: var(--f-story); }
+  .btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,.45); color: #f0e6d3; padding: clamp(11px,1.8vh,16px) 0; width: clamp(220px,32vw,320px); font-size: clamp(1em,2.4vh,1.25em); letter-spacing: .4em; text-indent: .4em; border-radius: 3px; cursor: pointer; font-family: inherit; transition: all .3s; }
+  .btn-ghost:active { background: rgba(255,255,255,.15); border-color: #e94560; transform: scale(.96); }
+  .home-func { position: absolute; right: 3vw; bottom: 4vh; display: flex; flex-direction: column; gap: 1vh; }
+  .home-func button { background: rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.18); color: rgba(240,230,211,.85); padding: clamp(8px,1.4vh,12px) clamp(12px,1.8vw,18px); border-radius: 8px; font-size: clamp(.8em,1.9vh,.95em); cursor: pointer; font-family: inherit; transition: all .25s; text-align: center; }
+  .home-func button:active { background: rgba(255,255,255,.15); transform: scale(.96); }
+  .home-meta { position: absolute; left: 2.5vw; bottom: 6vh; display: flex; gap: 1.4em; font-size: clamp(.7em,1.6vh,.85em); color: rgba(240,230,211,.5); }
+  .version-tag { position: absolute; left: 2.5vw; bottom: 2.2vh; font-size: clamp(.6em,1.4vh,.75em); color: rgba(240,230,211,.28); cursor: pointer; transition: transform .12s; user-select: none; }
+  .version-tag:active { transform: scale(.9); }
+  .project-cz { position: absolute; right: 2.5vw; bottom: 2.2vh; font-size: clamp(.6em,1.4vh,.75em); color: rgba(240,230,211,.35); letter-spacing: .22em; user-select: none; }
+
+  /* ===== 全局按钮 ===== */
+  .fullscreen-btn { position: fixed; top: 1.5vh; right: 1.5vw; z-index: 50; padding: clamp(8px,1.5vh,12px) clamp(14px,2vw,20px); background: rgba(0,0,0,.5); border: 1px solid rgba(255,255,255,.3); border-radius: 8px; color: #fff; cursor: pointer; font-family: inherit; font-size: clamp(.8em,1.8vh,.95em); transition: opacity .5s ease; }
+  .fullscreen-btn.hidden { opacity: 0; pointer-events: none; }
+  .fullscreen-btn:active { transform: scale(.96); }
+  .music-btn { position: fixed; top: calc(1.5vh + 52px); left: 1.5vw; z-index: 50; padding: clamp(8px,1.5vh,12px) clamp(14px,2vw,20px); background: rgba(0,0,0,.5); border: 1px solid rgba(255,255,255,.3); border-radius: 8px; color: #fff; cursor: pointer; font-family: inherit; font-size: clamp(.9em,2vh,1.1em); }
+  .music-btn.hidden { display: none; }
+  .music-btn:active { transform: scale(.96); }
+  .btn-back { position: absolute; top: 1.5vh; left: 1.5vw; padding: clamp(10px,1.8vh,16px) clamp(18px,3vw,28px); background: rgba(0,0,0,.55); border: 1px solid rgba(255,255,255,.3); border-radius: 8px; color: #fff; cursor: pointer; font-family: inherit; font-size: clamp(.8em,1.9vh,.95em); letter-spacing: .15em; transition: all .25s; z-index: 15; }
+  .btn-back:active { background: rgba(255,255,255,.15); transform: scale(.96); }
+
+  /* ===== 游戏主界面 ===== */
+  #pg-game { justify-content: flex-end; padding-bottom: 2vh; }
+
+  /* 剧情图片区域 */
+  .scene-image-wrap { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .scene-image-wrap img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .scene-img-fallback { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; background: rgba(0,0,0,.3); color: rgba(255,255,255,.35); font-size: clamp(1em,2.5vh,1.4em); font-family: var(--f-ui); letter-spacing: .1em; }
+
+  .char-area { flex: 1; display: flex; align-items: center; justify-content: center; font-size: clamp(3em,8vh,5em); opacity: .3; width: 100%; z-index: 2; position: relative; }
+  #char-icon { transition: transform .15s, opacity .15s; }
+  .dialogue-wrap { position: relative; width: min(92%, 760px); margin: 0 auto; z-index: 5; }
+  .char-name-plate { position: absolute; bottom: 100%; left: clamp(14px,2.5vw,24px); margin-bottom: clamp(4px,.8vh,8px); background: var(--bg-glass); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); border: 1px solid var(--border-glass); border-radius: 8px; padding: clamp(5px,.9vh,9px) clamp(14px,2vw,20px); font-family: var(--f-story); font-weight: bold; font-size: clamp(1em,2.2vh,1.25em); color: #ff8aa0; z-index: 6; white-space: nowrap; }
+  .dialogue-box { background: var(--bg-glass); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); padding: clamp(14px,2.2vh,22px) clamp(20px,3vw,32px); padding-bottom: clamp(26px,4vh,38px); border-radius: 14px; border: 1px solid var(--border-glass); min-height: clamp(90px,16vh,130px); cursor: pointer; width: 100%; position: relative; z-index: 5; }
+  .dlg-text { font-family: var(--f-story); line-height: 1.7; font-size: clamp(1em,2.3vh,1.2em); color: #f3f1ea; white-space: pre-wrap; }
+  .dlg-hint { position: absolute; right: clamp(10px,1.5vw,16px); bottom: clamp(6px,1vh,10px); font-size: clamp(.62em,1.4vh,.78em); color: rgba(255,255,255,.38); letter-spacing: .12em; }
+
+  /* 选项按钮（修复：确保可点击） */
+  .choices { position: absolute; bottom: calc(100% + 1.2vh); right: 0; display: none; flex-direction: column; gap: 1vh; width: clamp(230px,32vw,360px); z-index: 20; }
+  .choices.show { display: flex; }
+  .choice-btn { padding: clamp(9px,1.6vh,14px) clamp(14px,2vw,20px); background: var(--bg-glass); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); border: 1px solid var(--border-glass); border-radius: 10px; color: #f3f1ea; cursor: pointer; font-size: clamp(.85em,2vh,1.02em); font-family: var(--f-story); text-align: center; line-height: 1.5; transition: all .2s; text-shadow: 0 1px 4px rgba(0,0,0,.5); pointer-events: auto; position: relative; z-index: 20; }
+  .choice-btn:active { background: rgba(233,69,96,.4); border-color: #e94560; transform: scale(.96); }
+
+  /* 工具栏 */
+  .toolbar { position: absolute; top: calc(1.5vh + 52px); right: 1.5vw; display: flex; flex-direction: column; align-items: center; gap: 1vh; z-index: 15; }
+  .toolbar button { width: clamp(40px,6vh,54px); height: clamp(40px,6vh,54px); border: none; background: transparent; color: rgba(255,255,255,.85); cursor: pointer; font-size: clamp(1.3em,2.8vh,1.7em); display: flex; align-items: center; justify-content: center; transition: all .2s; text-shadow: 0 1px 6px rgba(0,0,0,.6); }
+  .toolbar button:active { transform: scale(.96); color: #e94560; }
+/* ===== 存档管理页 ===== */
+  .slot-page-title { font-family: var(--f-title); font-size: clamp(1.6em,4vh,2.2em); color: #f4d03f; margin-bottom: 2vh; letter-spacing: .2em; }
+  .tabs { display: flex; gap: 1vw; margin-bottom: 2vh; }
+  .tab { padding: clamp(8px,1.4vh,12px) clamp(20px,3vw,30px); background: rgba(0,0,0,.4); border: 1px solid rgba(255,255,255,.2); border-radius: 8px; color: rgba(240,230,211,.6); cursor: pointer; font-family: inherit; font-size: clamp(.85em,2vh,1em); transition: all .25s; }
+  .tab.on { background: rgba(233,69,96,.3); border-color: #e94560; color: #fff; }
+  .slot-list { width: min(90%, 600px); max-height: 52vh; overflow-y: auto; display: flex; flex-direction: column; gap: 1vh; padding: 0 4px; }
+  .slot-card { background: rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.15); border-radius: 10px; padding: clamp(12px,1.8vh,16px) clamp(14px,2vw,20px); cursor: pointer; transition: all .2s; }
+  .slot-card:active { background: rgba(255,255,255,.1); transform: scale(.98); }
+  .slot-title { font-size: clamp(.9em,2vh,1.05em); color: #f0e6d3; margin-bottom: .4vh; }
+  .slot-time { font-size: clamp(.72em,1.6vh,.85em); color: rgba(240,230,211,.5); }
+  .slot-empty { color: rgba(240,230,211,.3); font-style: italic; }
+  .slot-actions { display: flex; gap: .8vw; margin-top: .8vh; }
+  .slot-actions button { padding: clamp(5px,.9vh,8px) clamp(12px,1.8vw,18px); background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.25); border-radius: 6px; color: #f0e6d3; cursor: pointer; font-family: inherit; font-size: clamp(.7em,1.5vh,.82em); transition: all .2s; }
+  .slot-actions button:active { background: rgba(255,255,255,.25); transform: scale(.95); }
+
+  /* ===== 设置页 ===== */
+  .settings-panel { background: rgba(0,0,0,.55); border: 1px solid rgba(255,255,255,.18); border-radius: 16px; padding: clamp(24px,4vh,36px) clamp(24px,4vw,36px); width: min(92%, 420px); display: flex; flex-direction: column; gap: 2vh; }
+  .settings-title { font-family: var(--f-title); font-size: clamp(1.4em,3.5vh,1.8em); color: #f4d03f; text-align: center; letter-spacing: .3em; margin-bottom: 1vh; }
+  .setting-row { display: flex; align-items: center; justify-content: space-between; gap: 1vw; padding: .6vh 0; }
+  .setting-label { font-size: clamp(.85em,1.9vh,1em); color: rgba(240,230,211,.85); min-width: 5em; }
+  .setting-value { flex: 1; display: flex; justify-content: flex-end; }
+  .setting-value input[type="range"] { width: 100%; max-width: 180px; accent-color: #e94560; }
+  .toggle-btn { padding: clamp(6px,1vh,9px) clamp(14px,2vw,20px); background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.25); border-radius: 6px; color: rgba(240,230,211,.7); cursor: pointer; font-family: inherit; font-size: clamp(.8em,1.7vh,.92em); transition: all .25s; }
+  .toggle-btn.active { background: rgba(76,175,80,.35); border-color: #4caf50; color: #fff; }
+  .btn-logout { width: 100%; padding: clamp(10px,1.6vh,14px); background: rgba(233,69,96,.25); border: 1px solid rgba(233,69,96,.5); border-radius: 8px; color: #ff8a9e; cursor: pointer; font-family: inherit; font-size: clamp(.85em,1.9vh,1em); margin-top: 1vh; transition: all .25s; }
+  .btn-logout:active { background: rgba(233,69,96,.45); transform: scale(.97); }
+  .btn-close-settings { width: 100%; padding: clamp(10px,1.6vh,14px); background: transparent; border: 1px solid rgba(255,255,255,.35); border-radius: 8px; color: #f0e6d3; cursor: pointer; font-family: inherit; font-size: clamp(.85em,1.9vh,1em); transition: all .25s; }
+  .btn-close-settings:active { background: rgba(255,255,255,.12); transform: scale(.97); }
+
+  /* ===== 回顾面板 ===== */
+  .review-mask { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 200; opacity: 0; pointer-events: none; transition: opacity .35s; }
+  .review-mask.show { opacity: 1; pointer-events: auto; }
+  .review-panel { position: fixed; top: 0; right: 0; width: min(88vw, 420px); height: 100%; background: rgba(15,15,30,.96); border-left: 1px solid rgba(255,255,255,.15); z-index: 201; transform: translateX(105%); transition: transform .4s cubic-bezier(.22,1,.36,1); display: flex; flex-direction: column; }
+  .review-panel.show { transform: translateX(0); }
+  .review-head { display: flex; align-items: center; justify-content: space-between; padding: clamp(14px,2vh,20px) clamp(16px,2.5vw,24px); border-bottom: 1px solid rgba(255,255,255,.12); }
+  .review-title { font-family: var(--f-title); font-size: clamp(1.1em,2.5vh,1.35em); color: #f4d03f; }
+  .review-close { background: none; border: none; color: rgba(255,255,255,.6); font-size: clamp(1.2em,2.5vh,1.5em); cursor: pointer; padding: .2em; transition: color .2s; }
+  .review-close:active { color: #e94560; }
+  .review-list { flex: 1; overflow-y: auto; padding: clamp(12px,2vh,18px) clamp(14px,2vw,20px); display: flex; flex-direction: column; gap: 1.2vh; }
+  .review-item { font-family: var(--f-story); font-size: clamp(.82em,1.8vh,.95em); line-height: 1.6; color: rgba(243,241,234,.85); padding: clamp(8px,1.2vh,12px) clamp(10px,1.5vw,14px); background: rgba(255,255,255,.05); border-radius: 8px; border-left: 3px solid rgba(233,69,96,.5); }
+
+  /* ===== 确认弹窗 ===== */
+  .confirm-mask { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 300; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .3s; }
+  .confirm-mask.show { opacity: 1; pointer-events: auto; }
+  .confirm-box { background: rgba(20,20,40,.95); border: 1px solid rgba(255,255,255,.2); border-radius: 14px; padding: clamp(22px,3.5vh,32px) clamp(22px,4vw,34px); width: min(88%, 340px); text-align: center; transform: scale(.9); transition: transform .3s; }
+  .confirm-mask.show .confirm-box { transform: scale(1); }
+  .confirm-title { font-family: var(--f-title); font-size: clamp(1.1em,2.5vh,1.35em); color: #f4d03f; margin-bottom: 1.2vh; }
+  .confirm-desc { font-size: clamp(.85em,1.9vh,1em); color: rgba(240,230,211,.8); margin-bottom: 2.2vh; line-height: 1.6; }
+  .confirm-actions { display: flex; gap: 1vw; }
+  .confirm-actions button { flex: 1; padding: clamp(9px,1.5vh,13px); background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.25); border-radius: 8px; color: #f0e6d3; cursor: pointer; font-family: inherit; font-size: clamp(.85em,1.9vh,1em); transition: all .2s; }
+  .confirm-actions button:active { background: rgba(255,255,255,.22); transform: scale(.96); }
+  .confirm-actions button.danger { background: rgba(233,69,96,.3); border-color: rgba(233,69,96,.6); color: #ff9eae; }
+  .confirm-actions button.danger:active { background: rgba(233,69,96,.5); }
+
+  /* ===== 提示气泡 ===== */
+  #toast { position: fixed; bottom: clamp(6vh,8vh,10vh); left: 50%; transform: translateX(-50%) translateY(20px); background: rgba(0,0,0,.85); color: #fff; padding: clamp(10px,1.6vh,14px) clamp(20px,3vw,30px); border-radius: 999px; font-size: clamp(.82em,1.8vh,.95em); z-index: 500; opacity: 0; pointer-events: none; transition: all .35s; white-space: nowrap; }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ===== 收录徽章 ===== */
+  .unlock-badge { position: fixed; top: clamp(8vh,10vh,12vh); left: 50%; transform: translateX(-50%) scale(0); background: linear-gradient(135deg, #f4d03f, #e67e22); color: #1a1a2e; padding: clamp(10px,1.6vh,14px) clamp(22px,3.5vw,32px); border-radius: 999px; font-family: var(--f-title); font-size: clamp(.9em,2vh,1.1em); z-index: 400; transition: transform .45s cubic-bezier(.68,-.55,.27,1.55); box-shadow: 0 4px 20px rgba(244,208,63,.4); }
+  .unlock-badge.show { transform: translateX(-50%) scale(1); }
+
+  /* ===== MC风格成就动画 ===== */
+  .mc-achievement { position: fixed; top: clamp(6vh,8vh,10vh); left: 50%; transform: translateX(-50%) translateY(-120px); z-index: 450; display: flex; align-items: center; gap: clamp(10px,1.5vw,16px); background: linear-gradient(180deg, #2d2d2d, #1a1a1a); border: 3px solid #555; border-radius: 4px; padding: clamp(10px,1.5vh,14px) clamp(16px,2.5vw,24px); box-shadow: 0 4px 0 #000, inset 0 2px 0 rgba(255,255,255,.1); opacity: 0; pointer-events: none; transition: all .5s cubic-bezier(.68,-.55,.27,1.55); }
+  .mc-achievement.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  .mc-achievement .mc-icon { width: clamp(36px,5vh,48px); height: clamp(36px,5vh,48px); background: linear-gradient(135deg, #7cba3d, #4a8c1c); border: 2px solid #2d5a10; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: clamp(1.2em,2.5vh,1.6em); box-shadow: inset 0 -2px 0 rgba(0,0,0,.3); }
+  .mc-achievement .mc-text { display: flex; flex-direction: column; gap: .2vh; }
+  .mc-achievement .mc-label { font-family: var(--f-title); font-size: clamp(.7em,1.5vh,.85em); color: #f4d03f; letter-spacing: .1em; text-transform: uppercase; }
+  .mc-achievement .mc-title { font-family: var(--f-ui); font-size: clamp(.95em,2.1vh,1.15em); color: #fff; text-shadow: 2px 2px 0 #000; }
+  .mc-particle { position: fixed; width: 6px; height: 6px; background: #f4d03f; z-index: 449; pointer-events: none; animation: mcParticle .8s ease-out forwards; }
+  @keyframes mcParticle {
+    0% { opacity: 1; transform: translate(0,0) scale(1); }
+    100% { opacity: 0; transform: translate(var(--px), var(--py)) scale(0); }
   }
-  .page{overflow-y:auto;justify-content:safe center}
-  .slot-list{max-height:34vh}
-  .list{max-height:32vh}
-  .grid{width:min(92%,460px)}
-}
 
-.rotate-hint{position:absolute;top:1.6vh;left:50%;transform:translateX(-50%);z-index:9999;
-  display:flex;align-items:center;gap:.6em;
-  background:rgba(0,0,0,.78);border:1px solid rgba(255,255,255,.28);
-  color:#f0e6d3;padding:clamp(8px,1.4vh,12px) clamp(14px,2vw,20px);
-  border-radius:999px;font-size:clamp(.8em,1.9vh,.95em);
-  opacity:0;pointer-events:none;transition:opacity .5s;white-space:nowrap}
-.rotate-hint.show{opacity:1;pointer-events:auto}
-.rotate-hint .rh-icon{display:inline-block;animation:rotatePhone 2s ease-in-out infinite}
-.rotate-hint .rh-close{background:none;border:none;color:rgba(255,255,255,.7);font-size:1em;cursor:pointer;padding:0 0 0 .4em;font-family:inherit}
-@keyframes rotatePhone{0%,100%{transform:rotate(0deg)}50%{transform:rotate(90deg)}}
+  /* ===== 图鉴系统 ===== */
+  .codex-btn { position: absolute; top: calc(1.5vh + 52px); left: calc(1.5vw + 70px); z-index: 15; padding: clamp(8px,1.4vh,12px) clamp(12px,2vw,18px); background: rgba(0,0,0,.5); border: 1px solid rgba(255,255,255,.3); border-radius: 8px; color: #fff; cursor: pointer; font-family: inherit; font-size: clamp(.8em,1.8vh,.95em); transition: all .25s; }
+  .codex-btn:active { background: rgba(255,255,255,.15); transform: scale(.96); }
+  .codex-mask { position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 250; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .35s; }
+  .codex-mask.show { opacity: 1; pointer-events: auto; }
+  .codex-panel { background: linear-gradient(180deg, #1e1e3a, #12122a); border: 2px solid rgba(244,208,63,.3); border-radius: 16px; width: min(92%, 560px); max-height: 80vh; display: flex; flex-direction: column; overflow: hidden; transform: scale(.92); transition: transform .35s; }
+  .codex-mask.show .codex-panel { transform: scale(1); }
+  .codex-head { display: flex; align-items: center; justify-content: space-between; padding: clamp(14px,2vh,20px) clamp(18px,3vw,26px); border-bottom: 1px solid rgba(255,255,255,.1); background: rgba(244,208,63,.08); }
+  .codex-title { font-family: var(--f-title); font-size: clamp(1.2em,2.8vh,1.5em); color: #f4d03f; letter-spacing: .15em; }
+  .codex-close { background: none; border: none; color: rgba(255,255,255,.6); font-size: clamp(1.3em,2.8vh,1.6em); cursor: pointer; padding: .15em; transition: color .2s; }
+  .codex-close:active { color: #e94560; }
+  .codex-body { flex: 1; overflow-y: auto; padding: clamp(16px,2.5vh,24px); display: grid; grid-template-columns: repeat(auto-fill, minmax(clamp(100px,18vw,140px), 1fr)); gap: clamp(12px,2vh,18px); }
+  .codex-item { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); border-radius: 12px; padding: clamp(12px,1.8vh,16px) clamp(10px,1.5vw,14px); text-align: center; transition: all .25s; position: relative; overflow: hidden; }
+  .codex-item.locked { opacity: .45; filter: grayscale(.8); }
+  .codex-item.unlocked { border-color: rgba(244,208,63,.4); background: rgba(244,208,63,.08); }
+  .codex-item .ci-icon { font-size: clamp(2em,4.5vh,2.8em); margin-bottom: .6vh; }
+  .codex-item .ci-name { font-size: clamp(.75em,1.7vh,.9em); color: #f0e6d3; margin-bottom: .3vh; }
+  .codex-item .ci-desc { font-size: clamp(.62em,1.4vh,.75em); color: rgba(240,230,211,.5); line-height: 1.4; }
+  .codex-item .ci-lock { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: clamp(1.5em,3vh,2em); background: rgba(0,0,0,.3); }
 
-.page{display:none;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;position:absolute;top:0;left:0;padding:2vh 3vw}
-.page.active{display:flex}
+  /* ===== 增强版彩蛋（生气冲击风格） ===== */
+  #egg-overlay { position: fixed; inset: 0; z-index: 600; display: flex; align-items: center; justify-content: center; background: #000; opacity: 0; pointer-events: none; transition: opacity .15s; }
+  #egg-overlay.show { opacity: 1; pointer-events: auto; }
+  #egg-overlay.show { animation: eggFlash .12s steps(2) 6; }
+  @keyframes eggFlash {
+    0%, 100% { background: #000; }
+    50% { background: #3a0000; }
+  }
+  .egg-box { text-align: center; transform: scale(0); }
+  #egg-overlay.show .egg-box { animation: eggSlam .4s cubic-bezier(.68,-.55,.27,1.55) .7s forwards; }
+  @keyframes eggSlam {
+    0% { transform: scale(0) rotate(-5deg); }
+    60% { transform: scale(1.15) rotate(2deg); }
+    100% { transform: scale(1) rotate(0); }
+  }
+  .egg-text { font-family: var(--f-brush); font-size: clamp(2em,6vh,3.5em); color: #ff2020; text-shadow: 0 0 20px rgba(255,32,32,.8), 0 0 60px rgba(255,32,32,.4); letter-spacing: .1em; animation: eggShake .08s linear 10; }
+  @keyframes eggShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+  }
+  .egg-sub { margin-top: 2vh; font-size: clamp(.75em,1.7vh,.9em); color: rgba(255,100,100,.6); letter-spacing: .2em; }
+  #egg-overlay.show ~ #app { animation: screenShake .5s ease .7s; }
+  @keyframes screenShake {
+    0%, 100% { transform: translate(0); }
+    10% { transform: translate(-8px, 4px); }
+    20% { transform: translate(8px, -4px); }
+    30% { transform: translate(-6px, -3px); }
+    40% { transform: translate(6px, 3px); }
+    50% { transform: translate(-4px, 2px); }
+    60% { transform: translate(4px, -2px); }
+    70% { transform: translate(-2px, 1px); }
+    80% { transform: translate(2px, -1px); }
+    90% { transform: translate(-1px, 0); }
+  }
+  .egg-flame { position: fixed; bottom: 0; width: 8px; height: 8px; background: #ff4500; border-radius: 50%; z-index: 599; pointer-events: none; animation: flameRise 1s ease-out forwards; }
+  @keyframes flameRise {
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-40vh) scale(0); }
+  }
 
-#pg-home{
-  background-image:
-    linear-gradient(rgba(12,12,28,.55),rgba(12,12,28,.72)),
-    url('images/bg.jpg'),
-    url('bg.jpg'),
-    linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);
-  background-size:cover,cover,cover,auto;
-  background-position:center,center,center,center;
-  background-repeat:no-repeat,no-repeat,no-repeat,no-repeat;
-}
-.home-title-area{position:absolute;left:6vw;top:50%;transform:translateY(-50%);display:flex;align-items:flex-start;gap:1.6vw}
-.brush-title{writing-mode:vertical-rl;font-family:var(--f-brush);font-weight:400;font-size:clamp(3em,12vh,6em);color:#f5f0e6;letter-spacing:.15em;text-shadow:0 3px 22px rgba(0,0,0,.65)}
-.title-side{display:flex;gap:.9vw;align-items:flex-start;padding-top:.7em}
-.sub-v{writing-mode:vertical-rl;font-size:clamp(.85em,2.2vh,1.1em);color:rgba(245,240,230,.7);letter-spacing:.35em;font-family:var(--f-story)}
-.seal{writing-mode:vertical-rl;background:#9e2b2b;color:#fff;font-family:var(--f-brush);font-size:clamp(.75em,1.9vh,.95em);padding:.45em .35em;border-radius:4px;box-shadow:0 2px 10px rgba(0,0,0,.45)}
-.home-center{position:absolute;left:50%;bottom:5vh;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:1.6vh}
-.guide{font-style:italic;color:rgba(245,240,230,.6);font-size:clamp(.8em,1.9vh,.95em);text-align:center;font-family:var(--f-story)}
-.btn-ghost{background:transparent;border:1px solid rgba(255,255,255,.45);color:#f0e6d3;padding:clamp(11px,1.8vh,16px) 0;width:clamp(220px,32vw,320px);font-size:clamp(1em,2.4vh,1.25em);letter-spacing:.4em;text-indent:.4em;border-radius:3px;cursor:pointer;font-family:inherit;transition:all .3s}
-.btn-ghost:active{background:rgba(255,255,255,.15);border-color:#e94560}
-.btn-ghost:disabled{opacity:.3;cursor:not-allowed}
-.home-func{position:absolute;right:3vw;bottom:4vh;display:flex;flex-direction:column;gap:1vh}
-.home-func button{background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.18);color:rgba(240,230,211,.85);padding:clamp(8px,1.4vh,12px) clamp(12px,1.8vw,18px);border-radius:8px;font-size:clamp(.8em,1.9vh,.95em);cursor:pointer;font-family:inherit;transition:all .25s;text-align:center}
-.home-func button:active{background:rgba(255,255,255,.15)}
-.home-meta{position:absolute;left:2.5vw;bottom:6vh;display:flex;gap:1.4em;font-size:clamp(.7em,1.6vh,.85em);color:rgba(240,230,211,.5)}
-.version-tag{position:absolute;left:2.5vw;bottom:2.2vh;font-size:clamp(.6em,1.4vh,.75em);color:rgba(240,230,211,.28);cursor:pointer;transition:transform .12s;user-select:none}
-.project-cz{position:absolute;right:2.5vw;bottom:2.2vh;font-size:clamp(.6em,1.4vh,.75em);color:rgba(240,230,211,.35);letter-spacing:.22em;font-family:var(--f-ui);user-select:none}
+  /* ===== 登录界面 ===== */
+  #login-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); display: flex; align-items: center; justify-content: center; z-index: 99999; transition: opacity .6s ease; }
+  #login-overlay.fade-out { opacity: 0; pointer-events: none; }
+  .login-panel { background: rgba(255,255,255,.06); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,.18); border-radius: 16px; padding: clamp(28px,5vh,44px) clamp(24px,4vw,38px); width: min(88%, 380px); display: flex; flex-direction: column; align-items: center; gap: 2.2vh; }
+  .login-title { font-family: var(--f-brush); font-size: clamp(28px,5vh,36px); color: #f4d03f; letter-spacing: .12em; text-shadow: 0 2px 12px rgba(244,208,63,.3); margin-bottom: 1vh; }
+  .login-input { width: 100%; padding: clamp(11px,1.8vh,15px) clamp(14px,2vw,18px); background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.2); border-radius: 10px; color: #fff; font-size: clamp(.9em,2vh,1.05em); font-family: inherit; outline: none; transition: border-color .25s; }
+  .login-input::placeholder { color: rgba(255,255,255,.35); }
+  .login-input:focus { border-color: rgba(244,208,63,.6); }
+  .login-btn { width: 100%; padding: clamp(11px,1.8vh,15px); background: transparent; border: 1px solid rgba(255,255,255,.45); border-radius: 8px; color: #f0e6d3; font-size: clamp(.95em,2.1vh,1.1em); letter-spacing: .3em; text-indent: .3em; cursor: pointer; font-family: inherit; transition: all .3s; margin-top: .5vh; }
+  .login-btn:active { transform: scale(.96); background: rgba(255,255,255,.15); }
+  .login-error { color: #ff4d4d; font-size: clamp(.78em,1.7vh,.9em); min-height: 1.4em; text-align: center; opacity: 0; transition: opacity .3s; }
+  .login-error.show { opacity: 1; }
+  @keyframes shake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
+  .login-panel.shake { animation: shake .4s ease; }
 
-.fullscreen-btn{position:fixed;top:1.5vh;right:1.5vw;z-index:50;padding:clamp(8px,1.5vh,12px) clamp(14px,2vw,20px);background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.3);border-radius:8px;color:#fff;cursor:pointer;font-family:inherit;font-size:clamp(.8em,1.8vh,.95em);display:block}
-.fullscreen-btn.hidden{display:none}
-.music-btn{position:fixed;top:1.5vh;left:1.5vw;z-index:50;padding:clamp(8px,1.5vh,12px) clamp(14px,2vw,20px);background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.3);border-radius:8px;color:#fff;cursor:pointer;font-family:inherit;font-size:clamp(.9em,2vh,1.1em);display:block}
-.music-btn.hidden{display:none}
-
-#pg-game{justify-content:flex-end;padding-bottom:2vh}
-.char-area{flex:1;display:flex;align-items:center;justify-content:center;font-size:clamp(3em,8vh,5em);opacity:.3;width:100%}
-
-.dialogue-wrap{position:relative;width:min(92%,760px);margin:0 auto;z-index:5}
-.char-name-plate{position:absolute;bottom:100%;left:clamp(14px,2.5vw,24px);margin-bottom:clamp(4px,.8vh,8px);background:rgba(180,180,190,.16);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);border:1px solid rgba(255,255,255,.18);border-radius:8px;padding:clamp(5px,.9vh,9px) clamp(14px,2vw,20px);font-family:var(--f-story);font-weight:bold;font-size:clamp(1em,2.2vh,1.25em);color:#ff8aa0;z-index:6;white-space:nowrap}
-.dialogue-box{background:rgba(180,180,190,.16);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);padding:clamp(14px,2.2vh,22px) clamp(20px,3vw,32px);padding-bottom:clamp(26px,4vh,38px);border-radius:14px;border:1px solid rgba(255,255,255,.18);min-height:clamp(90px,16vh,130px);cursor:pointer;width:100%;position:relative;z-index:5}
-.dlg-text{font-family:var(--f-story);line-height:1.7;font-size:clamp(1em,2.3vh,1.2em);color:#f3f1ea}
-.special-line{font-family:var(--f-title);letter-spacing:.1em;color:#f4d03f}
-.dlg-hint{position:absolute;right:clamp(10px,1.5vw,16px);bottom:clamp(6px,1vh,10px);font-size:clamp(.62em,1.4vh,.78em);color:rgba(255,255,255,.38);letter-spacing:.12em;font-family:var(--f-ui)}
-
-/* 选项：毛玻璃材质，靠对话框右上角 */
-.choices{position:absolute;bottom:calc(100% + 1.2vh);right:0;display:none;flex-direction:column;gap:1vh;width:clamp(230px,32vw,360px);z-index:12}
-.choices.show{display:flex}
-.choice-btn{
-  padding:clamp(9px,1.6vh,14px) clamp(14px,2vw,20px);
-  background:rgba(180,180,190,.16);
-  backdrop-filter:blur(3px);
-  -webkit-backdrop-filter:blur(3px);
-  border:1px solid rgba(255,255,255,.18);
-  border-radius:10px;
-  color:#f3f1ea;
-  cursor:pointer;
-  font-size:clamp(.85em,2vh,1.02em);
-  font-family:var(--f-story);
-  text-align:center;
-  line-height:1.5;
-  transition:all .2s;
-  text-shadow:0 1px 4px rgba(0,0,0,.5);
-}
-.choice-btn:active{background:rgba(233,69,96,.4);border-color:#e94560;transform:scale(.98)}
-
-.toolbar{position:absolute;top:1.5vh;right:1.5vw;display:flex;flex-direction:column;align-items:center;gap:1vh;z-index:15}
-.toolbar button{width:clamp(40px,6vh,54px);height:clamp(40px,6vh,54px);border:none;background:transparent;color:rgba(255,255,255,.85);cursor:pointer;font-size:clamp(1.3em,2.8vh,1.7em);display:flex;align-items:center;justify-content:center;transition:all .2s;text-shadow:0 1px 6px rgba(0,0,0,.6)}
-.toolbar button:active{transform:scale(1.18);color:#e94560}
-.toolbar .tb-text{width:auto;height:auto;border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:clamp(6px,1vh,10px) clamp(12px,1.6vw,16px);font-size:clamp(.8em,1.9vh,.95em);font-family:inherit;letter-spacing:.15em}
-.btn-back{position:absolute;top:1.5vh;left:1.5vw;padding:clamp(10px,1.8vh,16px) clamp(18px,3vw,28px);background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.3);border-radius:8px;color:#fff;cursor:pointer;z-index:15;font-family:inherit;font-size:clamp(.9em,2vh,1.1em)}
-
-.scene-bg{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;transition:opacity .6s;overflow:hidden}
-.scene-bg .bg-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1vh}
-.scene-bg .bg-icon{font-size:clamp(3em,10vh,6em);opacity:.2}
-.scene-bg .bg-label{font-size:clamp(.8em,2vh,1em);color:rgba(255,255,255,.25)}
-
-.audio-indicator{position:absolute;top:1.5vh;left:clamp(130px,18vw,200px);z-index:16;display:none;align-items:center;gap:.5vw;background:rgba(0,0,0,.55);padding:clamp(6px,1vh,10px) clamp(12px,2vw,18px);border-radius:20px;border:1px solid rgba(255,255,255,.15)}
-.audio-indicator.show{display:flex}
-.audio-indicator .a-icon{font-size:clamp(1em,2vh,1.3em);animation:pulse 1.5s infinite}
-.audio-indicator .a-label{font-size:clamp(.7em,1.6vh,.85em);color:#a0a0b0;white-space:nowrap}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-
-.slot-mask{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.55);z-index:120;display:none;align-items:center;justify-content:center}
-.slot-mask.show{display:flex}
-.slot-panel{background:rgba(20,22,34,.88);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.2);border-radius:14px;width:min(92%,560px);padding:clamp(14px,2.5vh,22px);font-family:var(--f-ui)}
-.slot-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5vh;color:#e94560;font-size:clamp(1.05em,2.4vh,1.3em);letter-spacing:.1em}
-.slot-close{background:transparent;border:none;color:#f0e6d3;font-size:1.1em;cursor:pointer;padding:4px 8px}
-.slot-list{display:flex;flex-direction:column;gap:1vh;max-height:62vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
-.slot-row{display:flex;justify-content:space-between;align-items:center;padding:clamp(10px,1.8vh,14px) clamp(12px,2vw,18px);border:1px solid rgba(255,255,255,.18);border-radius:10px;background:rgba(255,255,255,.06);cursor:pointer;transition:all .2s}
-.slot-row:active{background:rgba(255,255,255,.15)}
-.slot-row .slot-name{font-weight:bold;color:#f0e6d3}
-.slot-row .slot-info{color:#a0a0b0;font-size:clamp(.75em,1.8vh,.9em)}
-.slot-row.empty .slot-info{color:rgba(78,204,163,.8)}
-.slot-row.off{opacity:.35;cursor:not-allowed}
-
-.btn{padding:clamp(14px,2.2vh,22px) clamp(36px,6vw,64px);font-size:clamp(1.05em,2.3vh,1.3em);border:none;border-radius:10px;cursor:pointer;margin:.6vh .5vw;transition:all .2s;font-family:inherit;min-width:8em}
-.btn:active{transform:scale(.97)}
-.btn-p{background:#e94560;color:#fff}
-.btn-s{background:#533483;color:#fff}
-.btn-d{background:#c0392b;color:#fff}
-.panel{background:rgba(255,255,255,.05);padding:clamp(18px,3vh,28px);border-radius:14px;width:min(92%,440px)}
-.panel label{display:block;margin:1.5vh 0 .8vh;color:#a0a0b0;font-size:clamp(.9em,2vh,1.05em)}
-.panel input[type=range]{width:100%;height:clamp(24px,4vh,32px);cursor:pointer}
-.panel select{padding:clamp(8px,1.5vh,12px) clamp(12px,2vw,18px);background:#16213e;color:#f0e6d3;border:1px solid #533483;border-radius:6px;font-size:clamp(.9em,2vh,1.05em);width:100%}
-.panel input[type=checkbox]{width:clamp(20px,3.5vh,26px);height:clamp(20px,3.5vh,26px);cursor:pointer;vertical-align:middle;margin-right:8px}
-.danger-zone{border-top:1px solid rgba(233,69,96,.3);padding-top:1.5vh;margin-top:1.5vh}
-
-.list{width:min(92%,600px);max-height:68vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
-.ach-item{display:flex;align-items:center;gap:1.2vw;padding:clamp(10px,1.8vh,14px);background:rgba(255,255,255,.05);border-radius:10px;margin-bottom:.8vh}
-.ach-item.on{border-left:4px solid #4ecca3}
-.ach-item.off{border-left:4px solid #555;opacity:.5}
-.ach-item .icon{font-size:clamp(1.4em,3vh,1.8em)}
-.ach-item b{font-size:clamp(.95em,2vh,1.1em)}
-.ach-item small{color:#a0a0b0;font-size:clamp(.75em,1.7vh,.9em)}
-
-.tabs{display:flex;gap:1vw;margin-bottom:1.5vh}
-.tab{padding:clamp(10px,1.8vh,16px) clamp(20px,3vw,32px);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;color:#f0e6d3;cursor:pointer;font-family:inherit;font-size:clamp(.9em,2vh,1.05em)}
-.tab.on{background:#e94560;border-color:#e94560}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2vw;width:min(92%,600px)}
-.g-item{aspect-ratio:1;background:rgba(255,255,255,.1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:clamp(1.4em,3vh,1.8em);flex-direction:column;gap:.4vh;position:relative;overflow:hidden}
-.g-item>span{font-size:.38em;color:#a0a0b0}
-.g-item.on{border:2px solid #4ecca3}
-.g-item.off{opacity:.3}
-.g-item .g-img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:2}
-.g-item .g-emoji{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1.6em;z-index:1}
-.g-item .g-name{position:absolute;bottom:0;left:0;width:100%;background:rgba(0,0,0,.5);color:#e8e8e8;font-size:clamp(.6em,1.5vh,.8em);padding:2px 0;text-align:center;z-index:3}
-
-.credits-box{text-align:center}
-.avatar{width:clamp(70px,12vh,90px);height:clamp(70px,12vh,90px);border-radius:50%;background:#533483;margin:0 auto 1.5vh;display:flex;align-items:center;justify-content:center;font-size:clamp(1.8em,4vh,2.4em)}
-.credits-name{font-size:clamp(1.2em,2.6vh,1.5em);color:#e94560;margin-bottom:1vh}
-.credits-bio{color:#a0a0b0;font-size:clamp(.85em,1.9vh,1em);line-height:1.6}
-
-h2{color:#e94560;margin-bottom:1.5vh;font-size:clamp(1.4em,3.2vh,1.8em)}
-
-/* ===== 邀请码遮罩 ===== */
-.invite-mask{position:absolute;top:0;left:0;width:100%;height:100%;z-index:10000;
-  background:rgba(10,10,20,.82);
-  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  display:flex;align-items:center;justify-content:center;
-  transition:opacity .6s;font-family:var(--f-ui)}
-.invite-mask.fade-out{opacity:0;pointer-events:none}
-.invite-mask.hidden{display:none}
-.invite-panel{display:flex;flex-direction:column;align-items:center;gap:1.6vh;
-  padding:clamp(26px,5vh,44px) clamp(30px,6vw,64px);
-  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);border-radius:16px;
-  box-shadow:0 8px 40px rgba(0,0,0,.45)}
-.invite-title{font-family:var(--f-brush);font-size:clamp(1.6em,4.5vh,2.4em);color:#f5f0e6;letter-spacing:.2em}
-.invite-sub{font-family:var(--f-story);color:rgba(240,230,211,.55);font-size:clamp(.85em,2vh,1em);letter-spacing:.4em;margin-bottom:.6vh}
-.invite-panel input{width:clamp(220px,30vw,320px);padding:clamp(12px,2vh,16px) clamp(16px,2.5vw,22px);
-  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.25);border-radius:999px;
-  color:#f0e6d3;font-size:clamp(1em,2.2vh,1.15em);text-align:center;letter-spacing:.25em;
-  font-family:inherit;outline:none;transition:all .3s}
-.invite-panel input:focus{border-color:#e94560;background:rgba(255,255,255,.12)}
-.invite-panel input::placeholder{color:rgba(240,230,211,.3);letter-spacing:.15em}
-.invite-err{font-size:clamp(.8em,1.9vh,.95em);color:#e94560;min-height:1.4em;opacity:0;transition:opacity .3s;font-family:var(--f-story)}
-.invite-err.show{opacity:1;animation:inviteShake .4s}
-.invite-btn{width:clamp(220px,30vw,320px)}
-@keyframes inviteShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
-
-/* ===== 彩蛋界面 ===== */
-.cz-egg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:9000;display:none;align-items:center;justify-content:center;cursor:pointer;background:radial-gradient(circle at center,rgba(70,0,12,.94),rgba(0,0,0,.97))}
-.cz-egg.show{display:flex}
-.cz-egg-inner{text-align:center;padding:0 6vw}
-.cz-egg-text{font-family:var(--f-title);font-size:clamp(1.7em,6.5vh,3.6em);color:#ff3b3b;letter-spacing:.05em;line-height:1.35;text-shadow:0 0 26px rgba(255,59,59,.55),0 4px 0 rgba(0,0,0,.5);animation:czSlam .45s cubic-bezier(.18,1.4,.4,1) both,czShake .45s .5s}
-.cz-egg-sub{margin-top:3vh;font-size:clamp(.7em,1.8vh,.9em);color:rgba(255,255,255,.4);letter-spacing:.2em;animation:czFadeIn .6s 1s both}
-@keyframes czSlam{0%{transform:scale(3);opacity:0}100%{transform:scale(1);opacity:1}}
-@keyframes czShake{0%,100%{transform:translateX(0) rotate(0)}20%{transform:translateX(-9px) rotate(-1.5deg)}40%{transform:translateX(9px) rotate(1.5deg)}60%{transform:translateX(-6px) rotate(-1deg)}80%{transform:translateX(6px) rotate(1deg)}}
-@keyframes czFadeIn{0%{opacity:0}100%{opacity:1}}
-
-.mc-toast{position:fixed;top:8vh;left:-340px;z-index:300;display:flex;align-items:center;gap:14px;background:#212121;border:2px solid #5a5a5a;box-shadow:inset 0 0 0 2px #131313,0 4px 12px rgba(0,0,0,.55);padding:12px 22px 12px 14px;border-radius:2px;animation:mcSlide 4.2s cubic-bezier(.22,.61,.36,1) forwards;min-width:240px}
-.mc-toast .mc-icon{font-size:1.9em;line-height:1}
-.mc-toast .mc-body{display:flex;flex-direction:column;gap:3px}
-.mc-toast .mc-head{font-size:.8em;color:#ffff55;letter-spacing:.05em;font-family:var(--f-ui)}
-.mc-toast .mc-name{font-size:1.05em;color:#ffffff;font-weight:bold}
-@keyframes mcSlide{
-  0%{left:-340px;opacity:0}
-  12%{left:2.5vw;opacity:1}
-  78%{left:2.5vw;opacity:1}
-  100%{left:-340px;opacity:0}
-}
-
-.toast{position:fixed;top:2vh;left:50%;transform:translateX(-50%);background:rgba(78,204,163,.92);color:#fff;padding:clamp(10px,1.8vh,14px) clamp(20px,3vw,28px);border-radius:10px;z-index:200;animation:tf 3s forwards;font-size:clamp(.9em,2vh,1.05em)}
-.toast.err{background:rgba(233,69,96,.92)}
-@keyframes tf{0%{opacity:0;transform:translateX(-50%) translateY(-10px)}10%{opacity:1;transform:translateX(-50%) translateY(0)}80%{opacity:1}100%{opacity:0}}
+  /* ===== 竖屏独立布局 ===== */
+  @media (orientation: portrait) {
+    .home-title-area { left: 50%; top: 6vh; transform: translateX(-50%); gap: 3vw; }
+    .brush-title { font-size: clamp(2.4em,8vh,3.8em); }
+    .title-side { padding-top: .5em; gap: 2vw; }
+    .home-center { bottom: 17vh; width: min(86%, 340px); }
+    .btn-ghost { width: 100%; padding: clamp(10px,1.6vh,14px) 0; font-size: clamp(.9em,2vh,1.1em); }
+    .home-func { right: 50%; transform: translateX(50%); bottom: 10vh; flex-direction: row; gap: 3vw; }
+    .home-func button { padding: clamp(7px,1.2vh,10px) clamp(16px,5vw,26px); font-size: clamp(.75em,1.7vh,.9em); }
+    .home-meta { left: 50%; transform: translateX(-50%); bottom: 6vh; }
+    .btn-back { padding: clamp(7px,1.2vh,10px) clamp(12px,3vw,18px); font-size: clamp(.72em,1.6vh,.85em); }
+    .fullscreen-btn { padding: clamp(7px,1.2vh,10px) clamp(10px,2.6vw,16px); font-size: clamp(.72em,1.6vh,.85em); }
+    .music-btn { top: calc(1.5vh + 42px); padding: clamp(7px,1.2vh,10px) clamp(12px,3vw,16px); font-size: clamp(.8em,1.8vh,.95em); }
+    .codex-btn { top: calc(1.5vh + 42px); left: calc(1.5vw + 58px); padding: clamp(6px,1vh,9px) clamp(10px,2vw,14px); font-size: clamp(.72em,1.6vh,.85em); }
+    .toolbar { top: calc(1.5vh + 42px); right: 2vw; gap: .6vh; }
+    .toolbar button { width: clamp(32px,4.6vh,40px); height: clamp(32px,4.6vh,40px); font-size: clamp(1em,2.2vh,1.25em); }
+    .char-area { font-size: clamp(2.4em,7vh,3.6em); }
+    .dialogue-wrap { width: 94%; }
+    .dialogue-box { min-height: clamp(84px,12vh,110px); padding: clamp(12px,1.8vh,16px) clamp(14px,3.4vw,20px); padding-bottom: clamp(24px,3.4vh,32px); }
+    .dlg-text { font-size: clamp(.88em,1.9vh,1.02em); }
+    .char-name-plate { font-size: clamp(.85em,1.9vh,1em); padding: clamp(4px,.7vh,7px) clamp(10px,2.6vw,16px); }
+    .choices { width: 100%; left: 0; right: 0; }
+    .choice-btn { font-size: clamp(.8em,1.8vh,.95em); padding: clamp(8px,1.4vh,12px) clamp(10px,2.6vw,16px); }
+    .slot-list { width: 94%; max-height: 58vh; }
+    .settings-panel { width: min(92%, 380px); padding: clamp(18px,3vh,28px) clamp(18px,4vw,28px); }
+    .review-panel { width: 100vw; }
+    .login-panel { width: min(92%, 340px); }
+    .codex-panel { width: min(94%, 400px); }
+    .codex-body { grid-template-columns: repeat(auto-fill, minmax(clamp(80px,22vw,110px), 1fr)); }
+    .mc-achievement { width: min(90%, 340px); }
+    .egg-text { font-size: clamp(1.5em,5vh,2.5em); }
+  }
 </style>
 </head>
-<body>
+<body><div id="app">
 
-<div id="app">
+  <!-- ===== 横屏提示 ===== -->
+  <div class="rotate-hint" id="rotate-hint">
+    <span class="rh-icon">📱</span> 建议横屏体验以获得最佳效果
+    <button class="rh-close" onclick="dismissRotateHint()">✕</button>
+  </div>
 
-<div class="rotate-hint" id="rotate-hint">
-  <span class="rh-icon">📱</span>
-  <span>横屏游玩体验更佳</span>
-  <button class="rh-close" onclick="vibrate(10);dismissHint()">✕</button>
-</div>
-
-<button class="fullscreen-btn" id="fs-btn" onclick="vibrate(15);tryFullscreen()">⛶ 全屏</button>
-<button class="music-btn" id="music-btn" onclick="vibrate(15);toggleBgm()">🎵</button>
-
-<audio id="bgm" src="首页音乐.mp3" loop preload="auto"></audio>
-
-<!-- 首页 -->
-<div class="page active" id="pg-home">
-  <div class="home-title-area">
-    <h1 class="brush-title">青春纪事</h1>
-    <div class="title-side">
-      <p class="sub-v">未命名篇章</p>
-      <span class="seal">伊</span>
+  <!-- ===== 登录界面 ===== -->
+  <div id="login-overlay">
+    <div class="login-panel" id="login-panel">
+      <div class="login-title">青春纪事</div>
+      <input type="text" class="login-input" id="login-account" placeholder="账号" autocomplete="off">
+      <input type="password" class="login-input" id="login-password" placeholder="密码" autocomplete="off">
+      <div class="login-error" id="login-error">账号或密码错误，请重试</div>
+      <button class="login-btn" id="login-btn">进 入 游 戏</button>
     </div>
   </div>
-  <div class="home-center">
-    <p class="guide" id="guide"></p>
-    <button class="btn-ghost" onclick="vibrate(30);startGame()">开始游戏</button>
-    <button class="btn-ghost" id="btn-cont" onclick="vibrate(30);contGame()" disabled>继续游戏</button>
-    <button class="btn-ghost" onclick="vibrate(30);openSlots('load')">读档</button>
-  </div>
-  <div class="home-func">
-    <button onclick="vibrate(20);go('settings')">⚙️ 设置</button>
-    <button onclick="vibrate(20);go('ach')">🏆 成就</button>
-    <button onclick="vibrate(20);go('gallery')">📖 图鉴</button>
-    <button onclick="vibrate(20);go('credits')">👤 制作人</button>
-  </div>
-  <div class="home-meta">
-    <span id="s-prog">进度: 未开始</span>
-    <span id="s-ach">成就: 0/5</span>
-    <span id="s-gal">图鉴: 0/6</span>
-  </div>
-  <p class="version-tag" id="version-tag" onclick="czEggClick()">Project CZ · v2.6 · 内测</p>
-  <div class="project-cz">PROJECT CZ · 内测版</div>
-</div>
 
-<!-- 游戏页 -->
-<div class="page" id="pg-game">
-  <div class="scene-bg" id="scene-bg"></div>
+  <!-- ===== 首页 ===== -->
+  <div class="page active" id="pg-home">
+    <button class="fullscreen-btn hidden" id="fullscreen-btn" onclick="toggleFullscreen()">⛶ 全屏</button>
 
-  <div class="audio-indicator" id="audio-ind">
-    <span class="a-icon">🎵</span>
-    <span class="a-label" id="audio-label">播放中</span>
+    <div class="home-title-area">
+      <div class="brush-title">青春纪事</div>
+      <div class="title-side">
+        <div class="sub-v">校园恋爱物语</div>
+        <div class="seal">测试版</div>
+      </div>
+    </div>
+
+    <div class="home-center">
+      <div class="guide">— 新学期 · 新的相遇 —</div>
+      <button class="btn-ghost" onclick="newGame()">新的篇章</button>
+      <button class="btn-ghost" onclick="continueGame()">继续旅程</button>
+    </div>
+
+    <div class="home-func">
+      <button onclick="showPage('pg-slots')">📂 存档</button>
+      <button onclick="openSettings()">⚙ 设置</button>
+      <button onclick="openCodex()">📖 图鉴</button>
+    </div>
+
+    <div class="home-meta">
+      <span>测试版</span>
+      <span>本地存档</span>
+    </div>
+
+    <!-- 版本号：连点10次触发增强版彩蛋 -->
+    <div class="version-tag" id="version-tag" onclick="tapVersion()">v0.3.1</div>
+    <div class="project-cz">Project CZ</div>
   </div>
 
-  <div class="toolbar">
-    <button class="tb-text" onclick="vibrate(15);openSlots('save')">存档</button>
-    <button class="tb-text" onclick="vibrate(15);openSlots('load')">读档</button>
-    <button onclick="vibrate(15);go('settings')" title="设置">⚙️</button>
-    <button onclick="vibrate(15);toggleAuto()" title="自动">▶️</button>
-    <button onclick="vibrate(15);showHistory()" title="回顾">📜</button>
-    <button onclick="vibrate(15);go('ach')" title="成就">🏆</button>
-  </div>
-  <button class="btn-back" onclick="vibrate(15);saveGame();goBack()">← 返回</button>
-  <div class="char-area" id="char-icon">🎭</div>
+  <!-- ===== 游戏主界面 ===== -->
+  <div class="page" id="pg-game">
+    <button class="btn-back" onclick="showPage('pg-home')">← 返回</button>
+    <button class="fullscreen-btn hidden" id="fullscreen-btn-game" onclick="toggleFullscreen()">⛶</button>
+    <button class="music-btn hidden" id="music-btn" onclick="toggleMusic()">🔊</button>
+    <button class="codex-btn" onclick="openCodex()">📖</button>
 
-  <div class="dialogue-wrap">
-    <div class="char-name-plate" id="c-name"></div>
-    <div class="choices" id="choices"></div>
-    <div class="dialogue-box" onclick="vibrate(10);advance()">
-      <div class="dlg-text" id="dlg-text"></div>
-      <div class="dlg-hint">点击对话框继续</div>
+    <!-- 剧情图片区域：未加载时显示文件名 -->
+    <div class="scene-image-wrap" id="scene-image-wrap">
+      <div class="scene-img-fallback" id="scene-img-fallback"></div>
+    </div>
+
+    <div class="toolbar">
+      <button onclick="toggleAuto()" title="自动播放">▶</button>
+      <button onclick="toggleSkip()" title="快进">⏩</button>
+      <button onclick="saveGame()" title="存档">💾</button>
+      <button onclick="loadGame()" title="读档">📂</button>
+      <button onclick="openReview()" title="回顾">📜</button>
+      <button onclick="openSettings()" title="设置">⚙</button>
+    </div>
+
+    <div class="char-area"><span id="char-icon">🧑‍🎓</span></div>
+
+    <div class="dialogue-wrap">
+      <div class="char-name-plate" id="char-name">???</div>
+      <div class="dialogue-box" id="dlg-box" onclick="advance()">
+        <div class="dlg-text" id="dlg-text"></div>
+        <div class="dlg-hint">点击继续 ▸</div>
+      </div>
+      <div class="choices" id="choices"></div>
     </div>
   </div>
-</div>
 
-<!-- 存档/读档面板 -->
-<div class="slot-mask" id="slot-mask" onclick="if(event.target===this)closeSlots()">
-  <div class="slot-panel">
-    <div class="slot-head"><span id="slot-title">存档</span><button class="slot-close" onclick="vibrate(10);closeSlots()">✕</button></div>
+  <!-- ===== 存档管理页 ===== -->
+  <div class="page" id="pg-slots">
+    <button class="btn-back" onclick="showPage('pg-home')">← 返回</button>
+    <div class="slot-page-title">存档管理</div>
+    <div class="tabs">
+      <button class="tab on" id="tab-save" onclick="switchTab('save')">存 档</button>
+      <button class="tab" id="tab-load" onclick="switchTab('load')">读 档</button>
+    </div>
     <div class="slot-list" id="slot-list"></div>
   </div>
-</div>
 
-<!-- 设置页 -->
-<div class="page" id="pg-settings">
-  <h2>数据与设置</h2>
-  <div class="panel">
-    <label>音量: <span id="vol-v">80</span></label>
-    <input type="range" min="0" max="100" value="80" oninput="vibrate(5);setVol(this.value)">
-    <label>文字速度:</label>
-    <select onchange="vibrate(15);setSpeed(this.value)"><option value="slow">慢</option><option value="normal" selected>正常</option><option value="fast">快</option></select>
-    <label><input type="checkbox" onchange="vibrate(15);setAuto(this.checked)"> 自动播放</label>
-    <div class="danger-zone">
-      <button class="btn btn-d" onclick="vibrate(30);resetAll()">重置进度</button>
+  <!-- ===== 设置页（到此为止！下面的浮层都不在这个div里） ===== -->
+  <div class="page" id="pg-settings">
+    <button class="btn-back" onclick="closeSettings()">← 返回</button>
+    <div class="settings-panel">
+      <div class="settings-title">设 置</div>
+      <div class="setting-row">
+        <span class="setting-label">文字速度</span>
+        <div class="setting-value"><input type="range" id="set-speed" min="0" max="100" value="50"></div>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">自动延迟</span>
+        <div class="setting-value"><input type="range" id="set-auto-delay" min="1" max="5" value="2"></div>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">背景音乐</span>
+        <div class="setting-value"><button class="toggle-btn active" id="toggle-bgm" onclick="toggleBGM()">开启</button></div>
+      </div>
+      <button class="btn-logout" onclick="logout()">退出登录</button>
+      <button class="btn-close-settings" onclick="closeSettings()">关 闭</button>
     </div>
   </div>
-  <button class="btn-back" style="position:relative;top:auto;left:auto;margin-top:2vh" onclick="vibrate(15);goBack()">← 返回</button>
-</div>
 
-<!-- 成就页 -->
-<div class="page" id="pg-ach">
-  <h2>成就</h2>
-  <div class="list" id="ach-list"></div>
-  <button class="btn-back" style="position:relative;top:auto;left:auto;margin-top:2vh" onclick="vibrate(15);goBack()">← 返回</button>
-</div>
+  <!-- ========== 全局浮层：与四个page平级，直接挂在#app下 ========== -->
 
-<!-- 图鉴页 -->
-<div class="page" id="pg-gallery">
-  <h2>图鉴</h2>
-  <div class="tabs">
-    <button class="tab on" onclick="vibrate(15);showGal('image',this)">📷 照片</button>
-    <button class="tab" onclick="vibrate(15);showGal('video',this)">🎬 视频</button>
-    <button class="tab" onclick="vibrate(15);showGal('audio',this)">🎵 录音</button>
+  <!-- 回顾面板 -->
+  <div class="review-mask" id="review-mask" onclick="closeReview()"></div>
+  <div class="review-panel" id="review-panel">
+    <div class="review-head">
+      <div class="review-title">📜 对话回顾</div>
+      <button class="review-close" onclick="closeReview()">✕</button>
+    </div>
+    <div class="review-list" id="review-list"></div>
   </div>
-  <div class="grid" id="gal-grid"></div>
-  <button class="btn-back" style="position:relative;top:auto;left:auto;margin-top:2vh" onclick="vibrate(15);goBack()">← 返回</button>
-</div>
 
-<!-- 制作人页 -->
-<div class="page" id="pg-credits">
-  <h2>制作人</h2>
-  <div class="credits-box">
-    <div class="avatar">👤</div>
-    <p class="credits-name">伊Aisby</p>
-    <p class="credits-bio">这里记录着制作人的话...<br>占位符版本，待正式内容替换。</p>
+  <!-- 图鉴系统 -->
+  <div class="codex-mask" id="codex-mask" onclick="closeCodex()">
+    <div class="codex-panel" onclick="event.stopPropagation()">
+      <div class="codex-head">
+        <div class="codex-title">📖 图 鉴</div>
+        <button class="codex-close" onclick="closeCodex()">✕</button>
+      </div>
+      <div class="codex-body" id="codex-body"></div>
+    </div>
   </div>
-  <button class="btn-back" style="position:relative;top:auto;left:auto;margin-top:2vh" onclick="vibrate(15);goBack()">← 返回</button>
-</div>
 
-<!-- 邀请码遮罩 -->
-<div class="invite-mask" id="invite-mask">
-  <div class="invite-panel">
-    <div class="invite-title">青春纪事</div>
-    <div class="invite-sub">内测邀请码</div>
-    <input type="text" id="invite-input" placeholder="请输入邀请码" autocomplete="off" maxlength="20">
-    <div class="invite-err" id="invite-err">邀请码错误，请重试</div>
-    <button class="btn-ghost invite-btn" onclick="checkInvite()">确认</button>
+  <!-- MC风格成就动画 -->
+  <div class="mc-achievement" id="mc-achievement">
+    <div class="mc-icon">🏆</div>
+    <div class="mc-text">
+      <div class="mc-label">成就达成！</div>
+      <div class="mc-title" id="mc-achievement-title">初次相遇</div>
+    </div>
   </div>
-</div>
 
-</div><!-- /app -->
-
-<!-- 彩蛋 -->
-<div class="cz-egg" id="cz-egg" onclick="hideEasterEgg()">
-  <div class="cz-egg-inner">
-    <div class="cz-egg-text">我身边怎么有那么多臭婊子！</div>
-    <div class="cz-egg-sub">— 点击任意处平息怒火 —</div>
+  <!-- 确认弹窗 -->
+  <div class="confirm-mask" id="confirm-mask">
+    <div class="confirm-box">
+      <div class="confirm-title" id="confirm-title">确认操作</div>
+      <div class="confirm-desc" id="confirm-desc"></div>
+      <div class="confirm-actions">
+        <button onclick="hideConfirm()">取消</button>
+        <button class="danger" id="confirm-ok">确定</button>
+      </div>
+    </div>
   </div>
-</div>
 
+  <!-- 提示气泡 -->
+  <div id="toast"></div>
+
+  <!-- 收录徽章 -->
+  <div class="unlock-badge" id="unlock-badge">📖 已收录</div>
+
+  <!-- 增强版彩蛋（生气冲击风格） -->
+  <div id="egg-overlay" onclick="hideEgg()">
+    <div class="egg-box">
+      <div class="egg-text">我身边怎么有那么多臭婊子？！</div>
+      <div class="egg-sub">—— 隐藏彩蛋 · 点击任意处关闭 ——</div>
+    </div>
+  </div>
+
+</div><!-- /#app -->
 <script>
-function vibrate(ms){if(navigator.vibrate)navigator.vibrate(ms)}
+// ============================================================
+// 【账号密码池 - 50个账号】
+// ============================================================
+const ACCOUNT_POOL = [
+  { account: 'player_01', password: '123456' },
+  { account: 'player_02', password: '123456' },
+  { account: 'player_03', password: '123456' },
+  { account: 'player_04', password: '123456' },
+  { account: 'player_05', password: '123456' },
+  { account: 'player_06', password: '123456' },
+  { account: 'player_07', password: '123456' },
+  { account: 'player_08', password: '123456' },
+  { account: 'player_09', password: '123456' },
+  { account: 'player_10', password: '123456' },
+  { account: 'player_11', password: '123456' },
+  { account: 'player_12', password: '123456' },
+  { account: 'player_13', password: '123456' },
+  { account: 'player_14', password: '123456' },
+  { account: 'player_15', password: '123456' },
+  { account: 'player_16', password: '123456' },
+  { account: 'player_17', password: '123456' },
+  { account: 'player_18', password: '123456' },
+  { account: 'player_19', password: '123456' },
+  { account: 'player_20', password: '123456' },
+  { account: 'player_21', password: '123456' },
+  { account: 'player_22', password: '123456' },
+  { account: 'player_23', password: '123456' },
+  { account: 'player_24', password: '123456' },
+  { account: 'player_25', password: '123456' },
+  { account: 'player_26', password: '123456' },
+  { account: 'player_27', password: '123456' },
+  { account: 'player_28', password: '123456' },
+  { account: 'player_29', password: '123456' },
+  { account: 'player_30', password: '123456' },
+  { account: 'player_31', password: '123456' },
+  { account: 'player_32', password: '123456' },
+  { account: 'player_33', password: '123456' },
+  { account: 'player_34', password: '123456' },
+  { account: 'player_35', password: '123456' },
+  { account: 'player_36', password: '123456' },
+  { account: 'player_37', password: '123456' },
+  { account: 'player_38', password: '123456' },
+  { account: 'player_39', password: '123456' },
+  { account: 'player_40', password: '123456' },
+  { account: 'player_41', password: '123456' },
+  { account: 'player_42', password: '123456' },
+  { account: 'player_43', password: '123456' },
+  { account: 'player_44', password: '123456' },
+  { account: 'player_45', password: '123456' },
+  { account: 'player_46', password: '123456' },
+  { account: 'player_47', password: '123456' },
+  { account: 'player_48', password: '123456' },
+  { account: 'player_49', password: '123456' },
+  { account: 'player_50', password: '123456' }
+];
 
-/* ===== 邀请码验证 ===== */
-function initInvite(){
-  var passed=false;
-  try{passed=localStorage.getItem('invite_pass')==='1'}catch(e){}
-  var mask=document.getElementById('invite-mask');
-  if(passed){mask.className='invite-mask hidden';return}
-  document.getElementById('invite-input').addEventListener('keydown',function(e){
-    if(e.key==='Enter'){e.stopPropagation();checkInvite()}
+// ===== 全局状态 =====
+let currentPage = 'pg-home';
+let currentScene = 0;
+let currentLine = 0;
+let isTyping = false;
+let typeTimer = null;
+let autoMode = false;
+let autoTimer = null;
+let skipMode = false;
+let skipTimer = null;
+let musicPlaying = true;
+let fullscreenTimer = null;
+let toastTimer = null;
+let currentTab = 'save';
+let achievements = JSON.parse(localStorage.getItem('cz_achievements') || '{}');
+let codexUnlocked = JSON.parse(localStorage.getItem('cz_codex') || '[]');
+
+// ===== 提示气泡 =====
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  if (!toast) return;
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+}
+
+// ===== 登录系统 =====
+function initLogin() {
+  const overlay = document.getElementById('login-overlay');
+  const panel = document.getElementById('login-panel');
+  const accountInput = document.getElementById('login-account');
+  const passwordInput = document.getElementById('login-password');
+  const errorText = document.getElementById('login-error');
+  const loginBtn = document.getElementById('login-btn');
+
+  if (!overlay || !accountInput || !passwordInput || !loginBtn) return;
+
+  if (localStorage.getItem('logged_user')) {
+    overlay.style.display = 'none';
+    return;
+  }
+
+  function showLoginError() {
+    if (errorText) errorText.classList.add('show');
+    if (panel) {
+      panel.classList.remove('shake');
+      void panel.offsetWidth;
+      panel.classList.add('shake');
+      setTimeout(() => panel.classList.remove('shake'), 450);
+    }
+  }
+
+  function doLogin() {
+    const acc = accountInput.value.trim();
+    const pwd = passwordInput.value.trim();
+    if (!acc || !pwd) { showLoginError(); return; }
+
+    const found = ACCOUNT_POOL.find(function(it) {
+      return it.account === acc && it.password === pwd;
+    });
+
+    if (found) {
+      localStorage.setItem('logged_user', JSON.stringify({ account: acc, time: Date.now() }));
+      if (errorText) errorText.classList.remove('show');
+      overlay.classList.add('fade-out');
+      setTimeout(function() { overlay.style.display = 'none'; }, 600);
+      showToast('欢迎回来，' + acc);
+    } else {
+      showLoginError();
+    }
+  }
+
+  loginBtn.addEventListener('click', doLogin);
+  accountInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') passwordInput.focus();
+  });
+  passwordInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') doLogin();
   });
 }
-function checkInvite(){
-  var v=document.getElementById('invite-input').value.trim();
-  if(v==='CZ2026'){
-    try{localStorage.setItem('invite_pass','1')}catch(e){}
-    vibrate(30);
-    var mask=document.getElementById('invite-mask');
-    mask.classList.add('fade-out');
-    setTimeout(function(){mask.className='invite-mask hidden'},650);
-    audioUnlocked=true;
-    if(curPage==='home'&&!bgmMuted)bgmPlay();
-  }else{
-    vibrate([40,30,40]);
-    var err=document.getElementById('invite-err');
-    err.classList.remove('show');
-    void err.offsetWidth;
-    err.classList.add('show');
+
+function logout() {
+  localStorage.removeItem('logged_user');
+  const overlay = document.getElementById('login-overlay');
+  if (overlay) {
+    overlay.style.display = 'flex';
+    overlay.classList.remove('fade-out');
   }
+  const accInput = document.getElementById('login-account');
+  const pwdInput = document.getElementById('login-password');
+  const errText = document.getElementById('login-error');
+  if (accInput) accInput.value = '';
+  if (pwdInput) pwdInput.value = '';
+  if (errText) errText.classList.remove('show');
+  showPage('pg-home');
+  showToast('已退出登录');
 }
 
-/* ===== 彩蛋：连点版本号 10 次 ===== */
-var czClicks=0,czResetTimer=null;
-function czEggClick(){
-  vibrate(8);
-  czClicks++;
-  clearTimeout(czResetTimer);
-  czResetTimer=setTimeout(function(){czClicks=0},2500);
-  var vt=document.getElementById('version-tag');
-  if(vt){vt.style.transform='scale(1.18)';setTimeout(function(){vt.style.transform=''},120)}
-  if(czClicks>=10){czClicks=0;showEasterEgg()}
-}
-function showEasterEgg(){
-  vibrate([80,40,80,40,120]);
-  document.getElementById('cz-egg').className='cz-egg show';
-}
-function hideEasterEgg(){
-  vibrate(15);
-  document.getElementById('cz-egg').className='cz-egg';
-}
-
-/* ===== 横屏提示 ===== */
-var mqPortrait=window.matchMedia('(orientation: portrait)');
-var hintDismissed=false,hintTimer=null;
-function updateHint(){
-  var hint=document.getElementById('rotate-hint');
-  if(!hint)return;
-  if(mqPortrait.matches&&!hintDismissed){
-    hint.classList.add('show');
-    clearTimeout(hintTimer);
-    hintTimer=setTimeout(function(){hint.classList.remove('show')},6500);
-  }else{
-    hint.classList.remove('show');
+// ===== 剧情数据（含图片字段，同文件夹读取） =====
+const STORY_DATA = [
+  {
+    id: 'scene_01',
+    name: '序章 · 相遇',
+    lines: [
+      { type: 'narration', text: '九月的阳光透过梧桐叶洒下斑驳的光影，新学期的第一天，空气中弥漫着粉笔灰和青草的味道。', img: 'Picture1.jpg' },
+      { type: 'dialogue', speaker: '林小满', icon: '👧', text: '（抱着课本匆匆跑过走廊）糟了糟了，要迟到了……' },
+      { type: 'dialogue', speaker: '陈屿', icon: '🧑', text: '（靠在教室门口，手里转着一支笔）同学，你的座位在最后一排。' },
+      { type: 'dialogue', speaker: '林小满', icon: '👧', text: '谢、谢谢！你是……新同学？' },
+      { type: 'dialogue', speaker: '陈屿', icon: '🧑', text: '（微微一笑）嗯，今天刚转来的。陈屿。' },
+      { type: 'narration', text: '就这样，在这个普通的九月，两段平行线有了交汇的可能。', img: 'Picture2.jpg' },
+      { type: 'dialogue', speaker: '林小满', icon: '👧', text: '我是林小满。那个……以后请多关照。' },
+      { type: 'dialogue', speaker: '陈屿', icon: '🧑', text: '彼此彼此。' },
+      {
+        type: 'choice',
+        prompt: '林小满心想……',
+        options: [
+          { text: '这个人看起来挺好相处的', next: 9 },
+          { text: '转学生啊……希望别太麻烦', next: 10 },
+          { text: '（心跳好像快了一拍）', next: 11 }
+        ]
+      },
+      { type: 'dialogue', speaker: '林小满', icon: '👧', text: '（他笑起来还挺好看的……不对，我在想什么！）', img: 'Picture3.jpg' },
+      { type: 'dialogue', speaker: '林小满', icon: '👧', text: '（转学生什么的，应该很快就会习惯吧。）' },
+      { type: 'dialogue', speaker: '林小满', icon: '👧', text: '（为什么他看我的时候，我会不敢直视……）' },
+      { type: 'narration', text: '上课铃响起，班主任推门而入。新学期的故事，正式拉开帷幕。' },
+      { type: 'dialogue', speaker: '班主任', icon: '👩‍', text: '同学们安静一下。今天我们班来了一位新同学，大家欢迎。' },
+      { type: 'dialogue', speaker: '陈屿', icon: '🧑', text: '（走上讲台，微微鞠躬）大家好，我是陈屿。请多指教。' },
+      { type: 'narration', text: '教室里响起稀稀拉拉的掌声。林小满注意到，陈屿的目光似乎在自己身上停留了一瞬。', img: 'Picture1.jpg' },
+      { type: 'dialogue', speaker: '林小满', icon: '👧', text: '（他刚才是不是看了我一眼……应该是错觉吧。）' },
+      { type: 'narration', text: '—— 第一章 · 完 ——\n\n感谢体验测试版剧情。正式版将持续更新。' }
+    ]
   }
-}
-function dismissHint(){
-  hintDismissed=true;
-  clearTimeout(hintTimer);
-  document.getElementById('rotate-hint').classList.remove('show');
-}
-function onOrientationMQ(){updateHint()}
-if(mqPortrait.addEventListener){mqPortrait.addEventListener('change',onOrientationMQ)}
-else if(mqPortrait.addListener){mqPortrait.addListener(onOrientationMQ)}
-
-function tryFullscreen(){
-  var el=document.documentElement;
-  if(el.requestFullscreen){el.requestFullscreen().then(lockLandscape).catch(function(){})}
-  else if(el.webkitRequestFullscreen){el.webkitRequestFullscreen();lockLandscape()}
-  else{toast('当前浏览器不支持全屏',1)}
-}
-function lockLandscape(){
-  if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(function(){})
-}
-
-var CHAPTER='第一章·入学';
-
-var CHARS={
-  '小郑':{n:'小郑',p:'主角',c:'#5b9bd5',i:'🧑'},
-  '内心':{n:'内心',p:'小郑的内心',c:'#a0a0b0',i:'💭'},
-  '旁白':{n:'旁白',p:'-',c:'#c8c8d0',i:'📖'},
-  '母亲':{n:'母亲',p:'小郑的母亲',c:'#e8a0c0',i:'👩'},
-  '麒麟':{n:'麒麟',p:'室友',c:'#f4d03f',i:'🦄'},
-  '小老鼠':{n:'小老鼠',p:'室友',c:'#4ecca3',i:'🐭'},
-  '老师':{n:'老师',p:'班主任',c:'#e94560',i:'👨‍🏫'}
-};
-
-var ACHS=[
-  {id:'a1',n:'初次相遇',d:'开始游戏，踏入学门',i:'🌸'},
-  {id:'a2',n:'三好学生',d:'选择乖乖上交手机',i:'📱'},
-  {id:'a3',n:'小心思',d:'选择把手机藏起来',i:'🤫'},
-  {id:'a4',n:'幽默大师',d:'问出那个关于老年机的问题',i:'😂'},
-  {id:'a5',n:'第一章完成',d:'通关第一章全部内容',i:'🎓'}
 ];
 
-var GALS=[
-  {id:'图片一',t:'image',n:'收费站',i:'🛣️'},
-  {id:'图片二',t:'image',n:'教室发呆',i:'😶'},
-  {id:'图片三',t:'image',n:'宿舍走廊',i:'🚪'},
-  {id:'图片四',t:'image',n:'推开宿舍门',i:'🛏️'},
-  {id:'图片五',t:'image',n:'前往教室',i:'🚶'},
-  {id:'图片六',t:'image',n:'教室',i:'🏫'}
+// ===== 图鉴数据 =====
+const CODEX_DATA = [
+  { id: 'lin', icon: '👧', name: '林小满', desc: '高二三班，普通又有点冒失的女生。' },
+  { id: 'chen', icon: '🧑', name: '陈屿', desc: '神秘转学生，总是带着淡淡的微笑。' },
+  { id: 'teacher', icon: '👩‍', name: '班主任', desc: '严厉但关心学生的中年女性。' },
+  { id: 'school', icon: '🏫', name: '星海高中', desc: '故事发生的舞台，沿海城市的名校。' },
+  { id: 'autumn', icon: '🍂', name: '九月', desc: '一切开始的季节。' },
+  { id: 'secret', icon: '❓', name: '???', desc: '尚未解锁的神秘条目……' }
 ];
 
-var SCENES=[
-{lines:[
-  {s:'旁白',t:'车子在收费站减速，窗外的收费站让我心跳漏了一拍。',m:{t:'image',id:'图片一'}},
-  {s:'旁白',t:'这就是我接下来要待三年的地方。'}
-],next:1},
-{lines:[
-  {s:'小郑',t:'发呆……',m:{t:'image',id:'图片二'}}
-],next:2},
-{lines:[
-  {s:'母亲',t:'寝室怎么走啊，先把这些东西放掉，再去教室？',m:{t:'image',id:'图片三'}},
-  {s:'小郑',t:'507，那肯定是5楼呀。'}
-],next:3},
-{lines:[
-  {s:'旁白',t:'推开那扇门的时候，它发出了一声很老的吱呀。',m:{t:'image',id:'图片四'}},
-  {s:'内心',t:'里面已经有人了。'},
-  {s:'旁白',t:'放好行李以后，前往教室。',m:{t:'image',id:'图片五'}},
-  {s:'内心',t:'他真勤快，居然第一件事就是套垃圾袋。'}
-],next:4},
-{lines:[
-  {s:'旁白',t:'走进教室的一刻，班里有一半的座位都被坐了。',m:{t:'image',id:'图片六'}},
-  {s:'内心',t:'讲台上那个箱子我猜是手机保管箱。'},
-  {s:'老师',t:'新同学找个位置坐下，手机放到讲台上这个箱子里，放学拿手机。'},
-  {s:'老师',t:'不要偷偷摸摸留在身边，不要一开学就吃个处分嗷。'}
-],choices:[
-  {t:'A. 乖乖上交手机，做个好学生',next:5,ach:'a2',gal:'图片一'},
-  {t:'B. 犹豫一下，偷偷把手机藏裤兜里',next:6,ach:'a3'},
-  {t:'C. 举手问老师：老年机也要交吗？',next:7,ach:'a4'}
-]},
-{lines:[
-  {s:'小郑',t:'（乖乖把手机放进箱子里）'},
-  {s:'老师',t:'很好，找个位置坐下吧。'},
-  {s:'内心',t:'三好学生，从今天开始。'}
-],next:8},
-{lines:[
-  {s:'小郑',t:'（犹豫了一下，偷偷把手机塞进裤兜）'},
-  {s:'内心',t:'应该……不会被发现吧？'},
-  {s:'旁白',t:'心跳比刚才在收费站的时候还快。'}
-],next:8},
-{lines:[
-  {s:'小郑',t:'老师，老年机也要交吗？'},
-  {s:'老师',t:'（愣了一下）……老年机？那倒不用。'},
-  {s:'旁白',t:'班里响起一阵低低的笑声。'},
-  {s:'内心',t:'很好，成功引起了全班的注意。'}
-],next:8},
-{lines:[
-  {s:'旁白',t:'—— 第一章 · 完 ——'}
-],end:true}
+// ===== 成就数据 =====
+const ACHIEVEMENT_DATA = [
+  { id: 'first_meet', title: '初次相遇', icon: '🏆', condition: '开始游戏' },
+  { id: 'first_choice', title: '命运的抉择', icon: '🎯', condition: '做出第一个选择' },
+  { id: 'chapter_1', title: '序章完结', icon: '📖', condition: '完成第一章' },
+  { id: 'egg_hunter', title: '禁忌之语', icon: '🔥', condition: '触发隐藏彩蛋' }
 ];
 
-var GUIDES=[
-  '车子在收费站减速的那一刻，故事开始了。',
-  '507，那肯定是5楼呀。',
-  '推开那扇门的时候，它发出了一声很老的吱呀。',
-  '讲台上那个箱子，我猜是手机保管箱。',
-  '不要一开学就吃个处分嗷。',
-  '他真勤快，居然第一件事就是套垃圾袋。'
-];
-
-function sv(k,v){try{localStorage.setItem('yc_'+k,JSON.stringify(v))}catch(e){}}
-function ld(k,d){try{var j=localStorage.getItem('yc_'+k);return j?JSON.parse(j):(d||null)}catch(e){return d||null}}
-function rm(k){localStorage.removeItem('yc_'+k)}
-
-var scene=0,line=0,typing=false,fullTxt='',ci=0,timer=null,autoOn=false,autoTm=null,hist=[],choiceLog=[];
-var curPage='home',prevPage='home';
-
-function volNow(){var s=ld('set',{});return (s.vol===undefined?80:s.vol)/100}
-
-var bgm=document.getElementById('bgm');
-var bgmMuted=false,bgmTriedAlt=false,audioUnlocked=false,fadeTimer=null;
-bgm.addEventListener('error',function(){
-  if(!bgmTriedAlt){bgmTriedAlt=true;bgm.src='images/首页音乐.mp3'}
-});
-function bgmPlay(){
-  if(fadeTimer){clearInterval(fadeTimer);fadeTimer=null}
-  bgm.volume=volNow();
-  var pr=bgm.play();
-  if(pr&&pr.catch)pr.catch(function(){});
-}
-function bgmFadeOut(){
-  if(fadeTimer)clearInterval(fadeTimer);
-  fadeTimer=setInterval(function(){
-    if(bgm.volume>0.02){bgm.volume=Math.max(0,bgm.volume-0.02)}
-    else{bgm.pause();bgm.volume=volNow();clearInterval(fadeTimer);fadeTimer=null}
-  },60);
-}
-function bgmUpdate(){
-  if(curPage==='game'){bgmFadeOut()}
-  else if(curPage==='home'&&!bgmMuted){bgmPlay()}
-}
-function toggleBgm(){
-  bgmMuted=!bgmMuted;
-  document.getElementById('music-btn').textContent=bgmMuted?'🔇':'🎵';
-  if(bgmMuted){bgmFadeOut()}else if(curPage==='home'){bgmPlay()}
-  toast(bgmMuted?'🔇 音乐：关':'🎵 音乐：开');
-}
-function unlockAudio(){
-  if(audioUnlocked)return;
-  audioUnlocked=true;
-  if(curPage==='home'&&!bgmMuted)bgmPlay();
-}
-document.addEventListener('touchend',unlockAudio,{once:true});
-document.addEventListener('click',unlockAudio,{once:true});
-
-var sfx=new Audio();
-function stopSfx(){
-  try{sfx.pause();sfx.currentTime=0;sfx.removeAttribute('src')}catch(e){}
-}
-function playSfx(id){
-  stopSfx();
-  probe(mediaSrcs(id,['mp3','wav','ogg']),function(url){
-    sfx.src=url;
-    sfx.volume=volNow();
-    var pr=sfx.play();
-    if(pr&&pr.catch)pr.catch(function(){});
-  },function(){});
-}
-
-function mediaSrcs(id,exts){
-  var out=[];
-  for(var e=0;e<exts.length;e++){out.push('images/'+id+'.'+exts[e]);out.push(id+'.'+exts[e])}
-  return out;
-}
-function probe(srcs,onOk,onFail){
-  var i=0;
-  function next(){
-    if(i>=srcs.length){onFail();return}
-    var s=srcs[i],el;
-    if(/\.(jpg|png)$/i.test(s)){el=new Image()}
-    else if(/\.(mp3|wav|ogg)$/i.test(s)){el=new Audio()}
-    else{el=document.createElement('video')}
-    el.onerror=function(){i++;next()};
-    el.onload=function(){onOk(s)};
-    el.onloadeddata=function(){onOk(s)};
-    el.src=s;
+// ===== 页面切换 =====
+function showPage(pageId) {
+  if (currentPage === 'pg-game' && pageId !== 'pg-game') saveSilent();
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  var target = document.getElementById(pageId);
+  if (target) target.classList.add('active');
+  currentPage = pageId;
+  var fsBtn = document.getElementById('fullscreen-btn-game');
+  var musicBtn = document.getElementById('music-btn');
+  if (pageId === 'pg-game') {
+    if (musicBtn) musicBtn.classList.remove('hidden');
+    startFullscreenTimer();
+  } else {
+    if (musicBtn) musicBtn.classList.add('hidden');
+    clearFullscreenTimer();
+    if (fsBtn) fsBtn.classList.add('hidden');
   }
-  next();
+  if (pageId === 'pg-slots') renderSlots(currentTab);
 }
 
-function go(p){
-  if(p!==curPage)prevPage=curPage;
-  curPage=p;
-  var ps=document.querySelectorAll('.page');
-  for(var i=0;i<ps.length;i++)ps[i].className='page';
-  document.getElementById('pg-'+p).className='page active';
-  var fsBtn=document.getElementById('fs-btn');
-  var mBtn=document.getElementById('music-btn');
-  if(p==='game'){fsBtn.className='fullscreen-btn hidden'}else{fsBtn.className='fullscreen-btn'}
-  if(p==='home'){mBtn.className='music-btn'}else{mBtn.className='music-btn hidden'}
-  if(p==='home'){refreshHome();clearSceneBg()}
-  if(p==='ach')renderAch();
-  if(p==='gallery')showGal('image');
-  if(p!=='game'){hideAudioInd();stopSfx()}
-  bgmUpdate();
+// ===== 设置页返回路由（从哪来回哪去）【本次唯一新增】 =====
+let settingsFrom = 'pg-home';
+function openSettings() {
+  if (currentPage !== 'pg-settings') settingsFrom = currentPage;
+  showPage('pg-settings');
 }
-function goBack(){
-  var target=(prevPage&&prevPage!==curPage)?prevPage:'home';
-  if(curPage==='game'){saveGame();target='home'}
-  go(target);
+function closeSettings() {
+  showPage(settingsFrom || 'pg-home');
 }
 
-function refreshHome(){
-  var prog=ld('save');
-  document.getElementById('btn-cont').disabled=!prog;
-  document.getElementById('s-prog').textContent=prog?(prog.done?'进度: 第一章已完成':'进度: 进行中'):'进度: 未开始';
-  var ach=ld('ach',{}),ac=0;for(var k in ach)if(ach[k])ac++;
-  document.getElementById('s-ach').textContent='成就: '+ac+'/5';
-  var gal=ld('gal',{}),gc=0;for(var k in gal)if(gal[k])gc++;
-  document.getElementById('s-gal').textContent='图鉴: '+gc+'/6';
-  document.getElementById('guide').textContent=GUIDES[Math.floor(Math.random()*GUIDES.length)];
+// ===== 全屏 =====
+function startFullscreenTimer() {
+  clearFullscreenTimer();
+  var btn = document.getElementById('fullscreen-btn-game');
+  if (btn) btn.classList.remove('hidden');
+  fullscreenTimer = setTimeout(function() { if (btn) btn.classList.add('hidden'); }, 2500);
+}
+function clearFullscreenTimer() { if (fullscreenTimer) { clearTimeout(fullscreenTimer); fullscreenTimer = null; } }
+document.addEventListener('mousemove', function() { if (currentPage === 'pg-game') startFullscreenTimer(); });
+document.addEventListener('touchstart', function() { if (currentPage === 'pg-game') startFullscreenTimer(); });
+function toggleFullscreen() {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(function(){});
+  else document.exitFullscreen();
+}
+function toggleMusic() {
+  musicPlaying = !musicPlaying;
+  var btn = document.getElementById('music-btn');
+  if (btn) btn.textContent = musicPlaying ? '🔊' : '🔇';
+  showToast(musicPlaying ? '音频已开启' : '音频已静音');
 }
 
-var bgToken=0;
-function showSceneBg(media){
-  var bg=document.getElementById('scene-bg');
-  var tk=++bgToken;
-  if(media.t==='image'){
-    probe(mediaSrcs(media.id,['jpg','png']),function(url){
-      if(tk!==bgToken)return;
-      bg.innerHTML='<img src="'+url+'" style="width:100%;height:100%;object-fit:cover">';
-      bg.style.opacity='1';
-    },function(){
-      if(tk!==bgToken)return;
-      bg.innerHTML='<div class="bg-placeholder"><div class="bg-icon">🖼️</div><div class="bg-label">[背景图片] '+media.id+'（放入同名文件后自动显示）</div></div>';
-      bg.style.opacity='1';
+// ===== 横屏提示 =====
+function checkOrientation() {
+  var hint = document.getElementById('rotate-hint');
+  if (!hint) return;
+  if (window.innerHeight > window.innerWidth && !localStorage.getItem('cz_hint_dismissed')) hint.classList.add('show');
+  else hint.classList.remove('show');
+}
+function dismissRotateHint() {
+  var hint = document.getElementById('rotate-hint');
+  if (hint) hint.classList.remove('show');
+  localStorage.setItem('cz_hint_dismissed', '1');
+}
+window.addEventListener('resize', checkOrientation);
+
+// ===== 图片加载（同文件夹本地文件，失败显示文件名） =====
+function loadSceneImage(imgFile) {
+  var wrap = document.getElementById('scene-image-wrap');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  if (!imgFile) return;
+  var img = document.createElement('img');
+  img.src = imgFile;
+  img.alt = imgFile;
+  img.style.maxWidth = '100%';
+  img.style.maxHeight = '100%';
+  img.style.objectFit = 'contain';
+  img.onerror = function() {
+    wrap.innerHTML = '';
+    var fb = document.createElement('div');
+    fb.className = 'scene-img-fallback';
+    fb.textContent = imgFile.replace(/\.[^.]+$/, '') + ' 未加载';
+    wrap.appendChild(fb);
+  };
+  wrap.appendChild(img);
+}
+
+// ===== 游戏流程 =====
+function newGame() {
+  currentScene = 0;
+  currentLine = 0;
+  showPage('pg-game');
+  renderLine();
+  showToast('开始新的篇章');
+  unlockAchievement('first_meet');
+}
+
+function continueGame() {
+  var data = localStorage.getItem('cz_save_auto');
+  if (data) {
+    var parsed = JSON.parse(data);
+    currentScene = parsed.scene || 0;
+    currentLine = parsed.line || 0;
+    showPage('pg-game');
+    renderLine();
+    showToast('已继续上次进度');
+  } else { newGame(); }
+}
+
+function renderLine() {
+  var scene = STORY_DATA[currentScene];
+  var line = scene ? scene.lines[currentLine] : null;
+  if (!scene || !line) {
+    stopAuto(); stopSkip();
+    unlockAchievement('chapter_1');
+    showToast('—— 本章结束 ——');
+    setTimeout(function() { showPage('pg-home'); }, 900);
+    return;
+  }
+
+  var textEl = document.getElementById('dlg-text');
+  var nameEl = document.getElementById('char-name');
+  var iconEl = document.getElementById('char-icon');
+  var choicesEl = document.getElementById('choices');
+  if (!textEl || !nameEl || !iconEl || !choicesEl) return;
+
+  choicesEl.classList.remove('show');
+  choicesEl.innerHTML = '';
+
+  if (line.img) loadSceneImage(line.img);
+
+  if (line.type === 'narration') {
+    nameEl.textContent = '旁白';
+    iconEl.textContent = '📖';
+    typeText(textEl, line.text);
+  } else if (line.type === 'dialogue') {
+    nameEl.textContent = line.speaker;
+    iconEl.textContent = line.icon || '🧑';
+    typeText(textEl, line.text);
+  } else if (line.type === 'choice') {
+    stopAuto();
+    nameEl.textContent = '选择';
+    iconEl.textContent = '💭';
+    textEl.textContent = line.prompt;
+    line.options.forEach(function(opt, idx) {
+      var btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.textContent = opt.text;
+      btn.style.pointerEvents = 'auto';
+      btn.style.position = 'relative';
+      btn.style.zIndex = '20';
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        currentLine = opt.next;
+        if (idx === 0) unlockAchievement('first_choice');
+        renderLine();
+      });
+      choicesEl.appendChild(btn);
     });
-    unlockGal(media.id,true);
-  }else if(media.t==='video'){
-    probe(mediaSrcs(media.id,['mp4','webm']),function(url){
-      if(tk!==bgToken)return;
-      bg.innerHTML='<video src="'+url+'" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover"></video>';
-      bg.style.opacity='1';
-    },function(){
-      if(tk!==bgToken)return;
-      bg.innerHTML='<div class="bg-placeholder"><div class="bg-icon">🎬</div><div class="bg-label">[背景视频] '+media.id+'（放入同名文件后自动播放）</div></div>';
-      bg.style.opacity='1';
+    setTimeout(function() { choicesEl.classList.add('show'); }, 200);
+  }
+}
+
+function typeText(el, text) {
+  clearInterval(typeTimer);
+  if (skipMode) { el.textContent = text; isTyping = false; return; }
+  isTyping = true;
+  el.textContent = '';
+  var i = 0;
+  var speed = getSpeed();
+  typeTimer = setInterval(function() {
+    if (i < text.length) { el.textContent += text[i]; i++; }
+    else {
+      clearInterval(typeTimer);
+      isTyping = false;
+      if (autoMode) scheduleAuto();
+    }
+  }, speed);
+}
+
+function getSpeed() {
+  var el = document.getElementById('set-speed');
+  var val = el ? parseInt(el.value) : 50;
+  return Math.max(10, 80 - val * 0.7);
+}
+
+function advance() {
+  var scene = STORY_DATA[currentScene];
+  if (!scene) return;
+  var line = scene.lines[currentLine];
+  if (!line || line.type === 'choice') return;
+  if (isTyping) {
+    clearInterval(typeTimer);
+    isTyping = false;
+    document.getElementById('dlg-text').textContent = line.text;
+    if (autoMode) scheduleAuto();
+    return;
+  }
+  currentLine++;
+  renderLine();
+}
+
+// ===== 自动 / 快进 =====
+function stopAuto() { autoMode = false; clearTimeout(autoTimer); }
+function stopSkip() { skipMode = false; clearInterval(skipTimer); }
+function toggleAuto() {
+  autoMode = !autoMode;
+  showToast(autoMode ? '自动播放：开' : '自动播放：关');
+  if (autoMode && !isTyping) scheduleAuto();
+  if (!autoMode) clearTimeout(autoTimer);
+}
+function scheduleAuto() {
+  clearTimeout(autoTimer);
+  var el = document.getElementById('set-auto-delay');
+  var delay = (el ? parseInt(el.value) : 2) * 1000;
+  autoTimer = setTimeout(function() { if (autoMode) advance(); }, delay);
+}
+function toggleSkip() {
+  skipMode = !skipMode;
+  showToast(skipMode ? '快进模式：开' : '快进模式：关');
+  if (skipMode) {
+    skipTimer = setInterval(function() {
+      var scene = STORY_DATA[currentScene];
+      var line = scene ? scene.lines[currentLine] : null;
+      if (!scene || !line || line.type === 'choice') { toggleSkip(); return; }
+      clearInterval(typeTimer); isTyping = false;
+      currentLine++;
+      renderLine();
+    }, 200);
+  } else { clearInterval(skipTimer); }
+}
+
+// ===== 存档系统 =====
+function saveSilent() {
+  var scene = STORY_DATA[currentScene];
+  localStorage.setItem('cz_save_auto', JSON.stringify({
+    scene: currentScene, line: currentLine,
+    name: scene ? scene.name : '未知',
+    time: new Date().toLocaleString('zh-CN')
+  }));
+}
+function saveGame() { saveSilent(); showToast('已存档'); }
+function loadGame() {
+  var data = localStorage.getItem('cz_save_auto');
+  if (data) {
+    var parsed = JSON.parse(data);
+    currentScene = parsed.scene; currentLine = parsed.line;
+    showPage('pg-game'); renderLine();
+    showToast('已读档');
+  } else showToast('暂无存档');
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  var tabSave = document.getElementById('tab-save');
+  var tabLoad = document.getElementById('tab-load');
+  if (tabSave) tabSave.classList.toggle('on', tab === 'save');
+  if (tabLoad) tabLoad.classList.toggle('on', tab === 'load');
+  renderSlots(tab);
+}
+
+function renderSlots(tab) {
+  var list = document.getElementById('slot-list');
+  if (!list) return;
+  list.innerHTML = '';
+  for (var i = 1; i <= 6; i++) {
+    var data = localStorage.getItem('cz_slot_' + i);
+    var card = document.createElement('div');
+    card.className = 'slot-card';
+    if (data) {
+      var parsed = JSON.parse(data);
+      card.innerHTML =
+        '<div class="slot-title">存档 ' + i + ' · ' + (parsed.name || '未命名') + '</div>' +
+        '<div class="slot-time">' + (parsed.time || '未知时间') + '</div>' +
+        '<div class="slot-actions">' +
+        (tab === 'load' ? '<button onclick="loadSlot(' + i + ')">读取</button>' : '') +
+        '<button onclick="deleteSlot(' + i + ', event)">删除</button>' +
+        '</div>';
+    } else {
+      card.innerHTML = '<div class="slot-title">存档 ' + i + '</div><div class="slot-time slot-empty">空</div>';
+    }
+    if (tab === 'save') {
+      (function(slotIndex) {
+        card.onclick = function() { saveToSlot(slotIndex); };
+      })(i);
+    }
+    list.appendChild(card);
+  }
+}
+
+function saveToSlot(i) {
+  var scene = STORY_DATA[currentScene];
+  var data = {
+    scene: currentScene, line: currentLine,
+    name: scene ? scene.name : '未知',
+    time: new Date().toLocaleString('zh-CN')
+  };
+  var key = 'cz_slot_' + i;
+  if (localStorage.getItem(key)) {
+    showConfirm('覆盖存档', '存档 ' + i + ' 已有数据，确定覆盖？', function() {
+      localStorage.setItem(key, JSON.stringify(data));
+      showToast('已保存到存档 ' + i);
+      renderSlots(currentTab);
     });
+  } else {
+    localStorage.setItem(key, JSON.stringify(data));
+    showToast('已保存到存档 ' + i);
+    renderSlots(currentTab);
   }
 }
-function clearSceneBg(){
-  bgToken++;
-  document.getElementById('scene-bg').innerHTML='';
-  document.getElementById('scene-bg').style.opacity='0';
-  hideAudioInd();
-}
 
-function showAudioInd(id){
-  var el=document.getElementById('audio-ind');
-  document.getElementById('audio-label').textContent='🎵 '+id+' 播放中';
-  el.className='audio-indicator show';
-}
-function hideAudioInd(){
-  document.getElementById('audio-ind').className='audio-indicator';
-}
-
-function isSpecialLine(t){
-  return t.indexOf('——')===0||t.indexOf('· 完 ·')>=0;
-}
-
-function startGame(){
-  if(ld('save')){if(!confirm('开始新游戏将覆盖现有进度，确定吗？'))return;rm('save')}
-  scene=0;line=0;hist=[];choiceLog=[];
-  unlockAch('a1');
-  go('game');showLine();
-}
-function contGame(){
-  var s=ld('save');if(!s){toast('没有存档',1);return}
-  scene=s.scene||0;line=s.line||0;hist=s.hist||[];choiceLog=s.choices||[];go('game');showLine();
-}
-function showLine(){
-  if(scene>=SCENES.length){endChapter();return}
-  var sc=SCENES[scene];
-  if(line>=sc.lines.length){advanceScene();return}
-  var l=sc.lines[line],ch=CHARS[l.s]||CHARS['旁白'];
-  document.getElementById('c-name').textContent=ch.n;
-  document.getElementById('c-name').style.color=ch.c;
-  document.getElementById('char-icon').textContent=ch.i;
-  document.getElementById('choices').className='choices';
-  if(l.m){
-    if(l.m.t==='audio'){showAudioInd(l.m.id);playSfx(l.m.id)}
-    else{hideAudioInd();stopSfx();showSceneBg(l.m)}
-  }else{hideAudioInd();stopSfx()}
-  fullTxt=l.t;ci=0;typing=true;
-  clearInterval(timer);
-  var dlgEl=document.getElementById('dlg-text');
-  dlgEl.className='dlg-text'+(isSpecialLine(l.t)?' special-line':'');
-  dlgEl.textContent='';
-  var setObj=ld('set',{spd:'normal'});
-  var spd=setObj.spd==='fast'?15:(setObj.spd==='slow'?80:40);
-  timer=setInterval(function(){
-    if(ci<fullTxt.length){dlgEl.textContent+=fullTxt[ci];ci++}
-    else{clearInterval(timer);typing=false;if(autoOn)autoTm=setTimeout(advance,2000)}
-  },spd);
-  hist.push({s:l.s,t:l.t});
-  saveGame();
-}
-function advance(){
-  if(typing){clearInterval(timer);document.getElementById('dlg-text').textContent=fullTxt;typing=false;return}
-  clearTimeout(autoTm);
-  line++;
-  var sc=SCENES[scene];
-  if(line>=sc.lines.length){advanceScene()}else{showLine()}
-}
-function advanceScene(){
-  var sc=SCENES[scene];
-  if(sc.choices){showChoices(sc.choices);return}
-  if(sc.end){endChapter();return}
-  scene=sc.next;line=0;showLine();
-}
-function showChoices(cs){
-  var box=document.getElementById('choices');box.innerHTML='';
-  for(var i=0;i<cs.length;i++){
-    var b=document.createElement('button');
-    b.className='choice-btn';b.textContent=cs[i].t;
-    b.setAttribute('data-idx',i);
-    b.onclick=function(){
-      vibrate(50);
-      var idx=parseInt(this.getAttribute('data-idx'));
-      var c=cs[idx];
-      choiceLog.push(c.t);
-      if(c.ach)unlockAch(c.ach);
-      if(c.gal)unlockGal(c.gal);
-      document.getElementById('choices').className='choices';
-      scene=c.next;line=0;showLine();
-    };
-    box.appendChild(b);
+function loadSlot(i) {
+  var data = localStorage.getItem('cz_slot_' + i);
+  if (data) {
+    var parsed = JSON.parse(data);
+    currentScene = parsed.scene; currentLine = parsed.line;
+    showPage('pg-game'); renderLine();
+    showToast('已读取存档 ' + i);
   }
-  box.className='choices show';
-}
-function endChapter(){
-  vibrate([100,50,100]);
-  unlockAch('a5');
-  sv('save',{scene:scene,line:line,hist:hist.slice(-30),choices:choiceLog.slice(),done:true});
-  setTimeout(function(){go('home')},2200);
-}
-function saveGame(){sv('save',{scene:scene,line:line,hist:hist.slice(-30),choices:choiceLog.slice(),done:false})}
-function toggleAuto(){autoOn=!autoOn;toast(autoOn?'▶️ 自动：开':'▶️ 自动：关')}
-function showHistory(){
-  var txt='--- 对话回顾 ---\n';
-  var r=hist.slice(-8);
-  for(var i=0;i<r.length;i++)txt+=r[i].s+': '+r[i].t+'\n';
-  alert(txt||'暂无记录');
 }
 
-var slotMode='save';
-function fmtTime(ts){
-  var d=new Date(ts);
-  var mm=('0'+(d.getMonth()+1)).slice(-2),dd=('0'+d.getDate()).slice(-2);
-  var hh=('0'+d.getHours()).slice(-2),mi=('0'+d.getMinutes()).slice(-2);
-  return mm+'/'+dd+' '+hh+':'+mi;
+function deleteSlot(i, e) {
+  if (e && e.stopPropagation) e.stopPropagation();
+  localStorage.removeItem('cz_slot_' + i);
+  showToast('存档 ' + i + ' 已删除');
+  renderSlots(currentTab);
 }
-function openSlots(mode){
-  slotMode=mode;
-  renderSlots();
-  document.getElementById('slot-mask').className='slot-mask show';
-}
-function closeSlots(){
-  document.getElementById('slot-mask').className='slot-mask';
-}
-function renderSlots(){
-  document.getElementById('slot-title').textContent=(slotMode==='save'?'💾 存档':'📂 读档');
-  var html='';
-  for(var i=1;i<=6;i++){
-    var d=ld('slot'+i);
-    if(d){
-      html+='<div class="slot-row on" data-i="'+i+'"><span class="slot-name">存档'+i+'</span><span class="slot-info">'+d.chapter+' - '+fmtTime(d.time)+'</span></div>';
-    }else if(slotMode==='save'){
-      html+='<div class="slot-row empty" data-i="'+i+'"><span class="slot-name">存档'+i+'</span><span class="slot-info">空白槽位 · 点击保存</span></div>';
-    }else{
-      html+='<div class="slot-row off" data-i="'+i+'"><span class="slot-name">存档'+i+'</span><span class="slot-info">空白槽位</span></div>';
+
+// ===== 回顾面板 =====
+function openReview() {
+  var scene = STORY_DATA[currentScene];
+  var list = document.getElementById('review-list');
+  if (!list) return;
+  list.innerHTML = '';
+  if (scene) {
+    for (var i = 0; i <= currentLine && i < scene.lines.length; i++) {
+      var line = scene.lines[i];
+      if (line.type === 'choice') continue;
+      var item = document.createElement('div');
+      item.className = 'review-item';
+      if (line.type === 'narration') {
+        item.innerHTML = '<span style="color:rgba(255,255,255,.5)">[旁白]</span> ' + line.text;
+      } else {
+        item.innerHTML = '<strong style="color:#ff8aa0">' + line.speaker + '</strong>：' + line.text;
+      }
+      list.appendChild(item);
     }
   }
-  var list=document.getElementById('slot-list');
-  list.innerHTML=html;
-  var rows=list.querySelectorAll('.slot-row');
-  for(var i=0;i<rows.length;i++){
-    rows[i].onclick=function(){
-      var idx=parseInt(this.getAttribute('data-i'));
-      if(slotMode==='save'){doSaveSlot(idx)}else{doLoadSlot(idx)}
+  var mask = document.getElementById('review-mask');
+  var panel = document.getElementById('review-panel');
+  if (mask) mask.classList.add('show');
+  if (panel) panel.classList.add('show');
+  list.scrollTop = list.scrollHeight;
+}
+function closeReview() {
+  var mask = document.getElementById('review-mask');
+  var panel = document.getElementById('review-panel');
+  if (mask) mask.classList.remove('show');
+  if (panel) panel.classList.remove('show');
+}
+
+// ===== 图鉴系统 =====
+function openCodex() {
+  renderCodex();
+  var mask = document.getElementById('codex-mask');
+  if (mask) mask.classList.add('show');
+}
+function closeCodex() {
+  var mask = document.getElementById('codex-mask');
+  if (mask) mask.classList.remove('show');
+}
+function renderCodex() {
+  var body = document.getElementById('codex-body');
+  if (!body) return;
+  body.innerHTML = '';
+  CODEX_DATA.forEach(function(item) {
+    var unlocked = codexUnlocked.indexOf(item.id) !== -1;
+    var div = document.createElement('div');
+    div.className = 'codex-item ' + (unlocked ? 'unlocked' : 'locked');
+    div.innerHTML =
+      '<div class="ci-icon">' + (unlocked ? item.icon : '🔒') + '</div>' +
+      '<div class="ci-name">' + (unlocked ? item.name : '???') + '</div>' +
+      '<div class="ci-desc">' + (unlocked ? item.desc : '尚未解锁') + '</div>';
+    body.appendChild(div);
+  });
+}
+function unlockCodex(id) {
+  if (codexUnlocked.indexOf(id) === -1) {
+    codexUnlocked.push(id);
+    localStorage.setItem('cz_codex', JSON.stringify(codexUnlocked));
+  }
+}
+
+// ===== MC风格成就系统 =====
+function unlockAchievement(id) {
+  if (achievements[id]) return;
+  achievements[id] = true;
+  localStorage.setItem('cz_achievements', JSON.stringify(achievements));
+  var data = null;
+  for (var i = 0; i < ACHIEVEMENT_DATA.length; i++) {
+    if (ACHIEVEMENT_DATA[i].id === id) { data = ACHIEVEMENT_DATA[i]; break; }
+  }
+  if (!data) return;
+  var el = document.getElementById('mc-achievement');
+  var titleEl = document.getElementById('mc-achievement-title');
+  if (!el || !titleEl) return;
+  var iconEl = el.querySelector('.mc-icon');
+  titleEl.textContent = data.title;
+  if (iconEl) iconEl.textContent = data.icon;
+  el.classList.add('show');
+  spawnMCParticles();
+  setTimeout(function() { el.classList.remove('show'); }, 3500);
+  if (id === 'first_meet') { unlockCodex('lin'); unlockCodex('chen'); }
+  if (id === 'chapter_1') { unlockCodex('school'); unlockCodex('autumn'); }
+}
+
+function spawnMCParticles() {
+  var el = document.getElementById('mc-achievement');
+  if (!el) return;
+  var rect = el.getBoundingClientRect();
+  var cx = rect.left + rect.width / 2;
+  var cy = rect.top + rect.height / 2;
+  var colors = ['#f4d03f', '#e67e22', '#7cba3d', '#fff'];
+  for (var i = 0; i < 12; i++) {
+    var p = document.createElement('div');
+    p.className = 'mc-particle';
+    var angle = (Math.PI * 2 / 12) * i;
+    var dist = 40 + Math.random() * 60;
+    p.style.left = cx + 'px';
+    p.style.top = cy + 'px';
+    p.style.setProperty('--px', Math.cos(angle) * dist + 'px');
+    p.style.setProperty('--py', Math.sin(angle) * dist + 'px');
+    p.style.background = colors[i % 4];
+    document.body.appendChild(p);
+    (function(particle) {
+      setTimeout(function() { if (particle.parentNode) particle.parentNode.removeChild(particle); }, 900);
+    })(p);
+  }
+}
+
+// ===== 确认弹窗 =====
+var confirmCallback = null;
+function showConfirm(title, desc, callback) {
+  var mask = document.getElementById('confirm-mask');
+  var titleEl = document.getElementById('confirm-title');
+  var descEl = document.getElementById('confirm-desc');
+  if (!mask || !titleEl || !descEl) return;
+  titleEl.textContent = title;
+  descEl.textContent = desc;
+  mask.classList.add('show');
+  confirmCallback = callback;
+  var okBtn = document.getElementById('confirm-ok');
+  if (okBtn) {
+    okBtn.onclick = function() {
+      hideConfirm();
+      if (confirmCallback) confirmCallback();
     };
   }
 }
-function doSaveSlot(i){
-  var old=ld('slot'+i);
-  if(old&&!confirm('存档'+i+' 已有记录（'+old.chapter+' - '+fmtTime(old.time)+'），确定覆盖吗？'))return;
-  sv('slot'+i,{scene:scene,line:line,chapter:CHAPTER,time:Date.now(),ach:ld('ach',{}),gal:ld('gal',{}),choices:choiceLog.slice()});
-  vibrate(30);
-  toast('💾 已保存到 存档'+i);
-  closeSlots();
-}
-function doLoadSlot(i){
-  var d=ld('slot'+i);
-  if(!d){toast('该槽位为空',1);return}
-  scene=d.scene||0;line=d.line||0;
-  choiceLog=d.choices||[];
-  sv('ach',d.ach||{});
-  sv('gal',d.gal||{});
-  hist=[];
-  vibrate(30);
-  closeSlots();
-  go('game');
-  showLine();
-  toast('📂 已读取 存档'+i);
+function hideConfirm() {
+  var mask = document.getElementById('confirm-mask');
+  if (mask) mask.classList.remove('show');
+  confirmCallback = null;
 }
 
-function unlockAch(id,silent){
-  var a=ld('ach',{});
-  if(a[id])return false;
-  a[id]=true;sv('ach',a);
-  if(!silent){
-    var info=null;
-    for(var i=0;i<ACHS.length;i++)if(ACHS[i].id===id)info=ACHS[i];
-    if(info){vibrate([50,30,50]);mcToast(info.i,info.n)}
-  }
-  return true;
-}
-function mcToast(icon,name){
-  var t=document.createElement('div');
-  t.className='mc-toast';
-  t.innerHTML='<span class="mc-icon">'+icon+'</span><div class="mc-body"><span class="mc-head">成就达成！</span><span class="mc-name">'+name+'</span></div>';
-  document.body.appendChild(t);
-  setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t)},4300);
-}
-function renderAch(){
-  var a=ld('ach',{}),html='';
-  for(var i=0;i<ACHS.length;i++){
-    var on=!!a[ACHS[i].id];
-    html+='<div class="ach-item '+(on?'on':'off')+'"><span class="icon">'+(on?ACHS[i].i:'🔒')+'</span><div><b>'+ACHS[i].n+'</b><br><small>'+ACHS[i].d+'</small></div></div>';
-  }
-  document.getElementById('ach-list').innerHTML=html;
+// ===== 设置 =====
+function toggleBGM() {
+  var btn = document.getElementById('toggle-bgm');
+  if (!btn) return;
+  var isOn = btn.classList.contains('active');
+  btn.classList.toggle('active');
+  btn.textContent = isOn ? '关闭' : '开启';
 }
 
-function unlockGal(id,silent){
-  var g=ld('gal',{});
-  if(g[id])return false;
-  g[id]=true;sv('gal',g);
-  if(!silent)toast('📖 图鉴解锁：'+getGalName(id));
-  return true;
-}
-function getGalName(id){
-  for(var i=0;i<GALS.length;i++)if(GALS[i].id===id)return GALS[i].n;
-  return id;
-}
-function showGal(type,btn){
-  var tabs=document.querySelectorAll('.tab');
-  for(var i=0;i<tabs.length;i++)tabs[i].className='tab';
-  if(btn)btn.className='tab on';
-  var g=ld('gal',{}),html='';
-  for(var i=0;i<GALS.length;i++){
-    if(GALS[i].t!==type)continue;
-    var on=!!g[GALS[i].id];
-    if(type==='image'&&on){
-      html+='<div class="g-item on"><span class="g-emoji">'+GALS[i].i+'</span><img class="g-img" data-id="'+GALS[i].id+'"><span class="g-name">'+GALS[i].n+'</span></div>';
-    }else{
-      html+='<div class="g-item '+(on?'on':'off')+'">'+(on?GALS[i].i:'🔒')+'<span>'+GALS[i].n+'</span></div>';
-    }
-  }
-  document.getElementById('gal-grid').innerHTML=html;
-  bindGalImgs();
-}
-function bindGalImgs(){
-  var imgs=document.querySelectorAll('.g-img');
-  for(var i=0;i<imgs.length;i++){
-    (function(img){
-      probe(mediaSrcs(img.getAttribute('data-id'),['jpg','png']),function(url){img.src=url},function(){img.style.display='none'});
-    })(imgs[i]);
+// ===== 增强版彩蛋（生气冲击风格） =====
+var eggCount = 0, eggResetTimer = null;
+function tapVersion() {
+  eggCount++;
+  clearTimeout(eggResetTimer);
+  eggResetTimer = setTimeout(function() { eggCount = 0; }, 1500);
+  if (eggCount >= 10) {
+    eggCount = 0;
+    triggerEgg();
   }
 }
 
-function setVol(v){
-  document.getElementById('vol-v').textContent=v;
-  var s=ld('set',{});s.vol=v;sv('set',s);
-  if(curPage!=='game')bgm.volume=v/100;
-  sfx.volume=v/100;
-}
-function setSpeed(v){var s=ld('set',{});s.spd=v;sv('set',s)}
-function setAuto(v){var s=ld('set',{});s.auto=v;sv('set',s)}
-function resetAll(){
-  if(!confirm('确定要重置所有进度吗？（包括6个存档槽位，不可撤销）'))return;
-  vibrate(100);
-  rm('save');rm('ach');rm('gal');rm('set');
-  for(var i=1;i<=6;i++)rm('slot'+i);
-  toast('已重置所有数据');refreshHome();
-}
-
-function toast(msg,err){
-  var t=document.createElement('div');t.className='toast'+(err?' err':'');
-  t.textContent=msg;document.body.appendChild(t);
-  setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t)},3200);
+function triggerEgg() {
+  var overlay = document.getElementById('egg-overlay');
+  if (!overlay) return;
+  overlay.classList.add('show');
+  unlockAchievement('egg_hunter');
+  var app = document.getElementById('app');
+  if (app) {
+    app.style.animation = 'none';
+    void app.offsetWidth;
+    app.style.animation = 'screenShake .5s ease .7s';
+  }
+  spawnFlames();
+  setTimeout(function() { hideEgg(); }, 4000);
 }
 
-function runTests(){
-  var p=0,f=0,r=[];
-  function ok(c,n){if(c){p++;r.push('✅ '+n)}else{f++;r.push('❌ '+n)}}
-  sv('t1',{a:1});ok(JSON.stringify(ld('t1'))==='{"a":1}','存储读写');
-  rm('t1');ok(ld('t1')===null,'存储删除');
-  ok(ld('nope','def')==='def','默认值');
-  ok(Object.keys(CHARS).length===7,'7个角色');
-  ok(ACHS.length===5,'5个成就');
-  ok(GALS.length===6,'6个图鉴');
-  ok(SCENES.length===9,'9个场景');
-  ok(SCENES.choices&&SCENES.choices.length===3,'分支存在');
-  ok(SCENES.end===true,'结束标记');
-  ok(!!document.getElementById('app'),'伪横屏容器');
-  ok(!!document.getElementById('rotate-hint'),'提示条存在');
-  ok(!!document.getElementById('cz-egg'),'彩蛋界面');
-  ok(!!document.querySelector('.char-name-plate'),'外置姓名牌');
-  ok(!!document.getElementById('invite-mask'),'邀请码遮罩');
-  rm('ach');unlockAch('a1',true);var a=ld('ach',{});ok(a.a1===true,'成就解锁(静默)');
-  rm('gal');unlockGal('图片一',true);unlockGal('图片二',true);unlockGal('图片三',true);unlockGal('图片四',true);unlockGal('图片五',true);
-  var g=ld('gal',{});ok(g['图片一']&&g['图片二']&&g['图片三']&&g['图片四']&&g['图片五'],'图鉴解锁5个(静默)');
-  sv('slot9',{scene:0,line:0,chapter:CHAPTER,time:Date.now(),ach:{},gal:{},choices:[]});ok(!!ld('slot9'),'存档槽读写');rm('slot9');
-  rm('ach');rm('gal');rm('save');rm('set');
-  alert('测试结果：通过 '+p+' / 失败 '+f+'\n\n'+r.join('\n'));
+function spawnFlames() {
+  for (var i = 0; i < 20; i++) {
+    (function(idx) {
+      setTimeout(function() {
+        var f = document.createElement('div');
+        f.className = 'egg-flame';
+        f.style.left = (Math.random() * 100) + 'vw';
+        f.style.animationDelay = (Math.random() * 0.3) + 's';
+        var size = (4 + Math.random() * 6) + 'px';
+        f.style.width = size;
+        f.style.height = size;
+        document.body.appendChild(f);
+        setTimeout(function() { if (f.parentNode) f.parentNode.removeChild(f); }, 1200);
+      }, idx * 80);
+    })(i);
+  }
 }
-document.addEventListener('keydown',function(e){
-  var t=e.target;
-  if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT'||t.tagName==='TEXTAREA'))return;
-  if(e.key==='t'||e.key==='T'){runTests()}
-});
 
-initInvite();
-refreshHome();
-bgmUpdate();
-updateHint();
+function hideEgg() {
+  var overlay = document.getElementById('egg-overlay');
+  if (overlay) overlay.classList.remove('show');
+  var app = document.getElementById('app');
+  if (app) app.style.animation = '';
+}
+
+// ===== 初始化 =====
+checkOrientation();
+if (codexUnlocked.length === 0) unlockCodex('teacher');
+initLogin();
 </script>
 </body>
 </html>
